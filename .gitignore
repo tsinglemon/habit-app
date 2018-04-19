@@ -1,0 +1,4 @@
+/server/node_modules
+/fontEnd/node_modules
+/server/data/db
+/server/data/log

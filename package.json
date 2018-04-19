@@ -1,0 +1,20 @@
+{
+  "name": "habit-app",
+  "version": "1.0.0",
+  "description": "管理习惯的小应用",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsinglemon/habit-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tsinglemon/habit-app/issues"
+  },
+  "homepage": "https://github.com/tsinglemon/habit-app#readme"
+}
