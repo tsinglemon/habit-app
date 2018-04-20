@@ -9,7 +9,7 @@ const common = require('./webpack.common.js');
 module.exports = merge(common,{
     devServer: {
         proxy: {
-            "/api": "http://localhost:3006"
+            "/api": "http://localhost:3008"
         },
         publicPath:"/",
         contentBase: "./src",

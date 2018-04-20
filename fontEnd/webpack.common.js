@@ -13,7 +13,7 @@ module.exports = {
     // 输出
     output: {
         // 打包后的输出的目录
-        path: path.resolve(__dirname, "../server/static/"),
+        path: path.resolve(__dirname, "build/"),
         // 通常是线上的绝对路径，如果是本地的话为空就行
         publicPath: "",
         // 输出的文件名，如果有多个文件就用方括号表示不同的文件名
@@ -94,9 +94,9 @@ module.exports = {
             cache: true,
             // 指定引入的出口文件，如果不写，将全部引用
             // 注意，如果使用了CommonsChunkPlugin抽取公共模块，那么抽取出来的公共模块也要一同写上，不然会引用不到公共模块
-            chunks: ["common","app", "app1"],
+            // chunks: ["common","app", "app1"],
             // 跟chunks相反，即跳过指定的出口文件
-            excludeChunks: ["app1"]
+            // excludeChunks: ["app1"]
         }),
     ]
 };
