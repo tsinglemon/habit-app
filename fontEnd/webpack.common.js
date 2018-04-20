@@ -14,12 +14,12 @@ module.exports = {
     output: {
         // 打包后的输出的目录
         path: path.resolve(__dirname, "build/"),
-        // 通常是线上的绝对路径，如果是本地的话为空就行
-        publicPath: "",
+        // 线上的绝对路径，如果是本地的话为空就行
+        publicPath: "/",
         // 输出的文件名，如果有多个文件就用方括号表示不同的文件名
-        filename: "js/[name].js",
+        filename: "[name].js",
         // 设置按需加载的文件名
-        chunkFilename: 'js/[name].chunk.js',
+        chunkFilename: 'javascript/[name].chunk.js',
     },
     // 解析
     resolve: {
@@ -32,7 +32,7 @@ module.exports = {
         // 给源码目录起名字，方便在源码上请求其他模块时少写一些路径代码，但不会作用在配置文件里。
         alias: {
             // 在源码中请求 src/resolve 下的 m1.js 文件时，变成这样 moduleDirName/m1.js
-            moduleDirName: path.resolve(__dirname, "src/resolve")
+            // moduleDirName: path.resolve(__dirname, "src/resolve")
         }
     },
     // 解析模块
