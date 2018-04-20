@@ -1,7 +1,19 @@
-
 {
-    "presets": ["env", "react"],
+    "presets": [
+        "env",
+        "stage-1",
+        "react"
+    ],
     "plugins": [
-        "transform-object-rest-spread"
+        "transform-object-rest-spread",
+        [
+            "transform-runtime",
+            {
+                "helpers": false,
+                "polyfill": false,
+                "regenerator": true,
+                "moduleName": "babel-runtime"
+            }
+        ]
     ]
 }
