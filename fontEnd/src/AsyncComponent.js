@@ -1,3 +1,5 @@
+/*
+// 第一种写法
 import React, { Component } from "react";
 
 export default function asyncComponent(importComponent) {
@@ -27,6 +29,42 @@ export default function asyncComponent(importComponent) {
 
   return AsyncComponent;
 }
+*/
+//第二种写法
+import React from 'react'
+export const asyncComponent = loadComponent => (
+    class AsyncComponent extends React.Component {
+        state = {
+            Component: null,
+        }
+
+        componentWillMount() {
+            if (this.hasLoadedComponent()) {
+                return;
+            }
+
+            loadComponent()
+                .then(module => module.default)
+                .then((Component) => {
+                    this.setState({ Component });
+                })
+                .catch((err) => {
+                    console.error(`Cannot load component in <AsyncComponent />`);
+                    throw err;
+                });
+        }
+
+        hasLoadedComponent() {
+            return this.state.Component !== null;
+        }
+
+        render() {
+            const { Component } = this.state;
+            return (Component) ? <Component {...this.props} /> : null;
+        }
+    }
+);
+
 
 // 路由v4的按需加载 https://segmentfault.com/a/1190000009539836#articleHeader4
 // 但报错“Uncaught ReferenceError: regeneratorRuntime is not defined”

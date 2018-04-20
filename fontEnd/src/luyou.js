@@ -10,7 +10,7 @@ import Zujian2 from "./zujian2.jsx"
 // 使用这个按需加载必须做好babel转换工作，
 // 具体怎么配置babel在asyncComponent模块注释里备注了相应参考资料
 // 做了按需加载就不要在其他地方单独引入，否则不会打包成chunk
-import asyncComponent from "./asyncComponent.js"
+import {asyncComponent} from "./asyncComponent.js"
 const Zujian3 = asyncComponent(() => import(/*webpackChunkName:"zujian3"*/"./zujian3.jsx"));
 
 
