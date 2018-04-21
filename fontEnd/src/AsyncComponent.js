@@ -1,8 +1,22 @@
 
 //第二种写法
+
+// com             String ===> 要提取的组件名，不传默认是default
+// loadComponent   Function ===> () => import("Zujian3",/*webpackChunkName:"zujian3"*/"./zujian3.jsx")
 import React from 'react'
-export const asyncComponent = loadComponent => (
-    class AsyncComponent extends React.Component {
+export const asyncComponent = (com, loadComponent) => {
+    if (!com && com !== "") return console.error("asyncComponent函数至少传入一个import()");
+    if (loadComponent) {
+        com = typeof com === "function" ? com().toString()
+            : typeof com === "string" && com !== "" ? com
+                : "default";
+    } else {
+        loadComponent = com;
+        com = "default"
+    }
+
+
+    return class AsyncComponent extends React.Component {
         state = {
             Component: null,
         }
@@ -13,7 +27,13 @@ export const asyncComponent = loadComponent => (
             }
 
             loadComponent()
-                .then(module => module.default)
+                .then(module => {
+                    if (module[com] === undefined) {
+                        console.error("asyncComponent函数不指定组件，默认走default的组件，请检查组件是否正确导出！")
+                    } else {
+                        return module[com]
+                    }
+                })
                 .then((Component) => {
                     this.setState({ Component });
                 })
@@ -32,7 +52,7 @@ export const asyncComponent = loadComponent => (
             return (Component) ? <Component {...this.props} /> : null;
         }
     }
-);
+};
 
 
 // 路由v4的按需加载 https://segmentfault.com/a/1190000009539836#articleHeader4

@@ -11,7 +11,10 @@ import Zujian2 from "./zujian2.jsx"
 // 具体怎么配置babel在asyncComponent模块注释里备注了相应参考资料
 // 做了按需加载就不要在其他地方单独引入，否则不会打包成chunk
 import {asyncComponent} from "./asyncComponent.js"
-const Zujian3 = asyncComponent(() => import(/*webpackChunkName:"zujian3"*/"./zujian3.jsx"));
+const Moren = asyncComponent("Zujian2",() => import(/*webpackChunkName:"zujianMoren"*/"./zujian3.jsx"));
+const Zujian3 = asyncComponent("Zujian3",() => import(/*webpackChunkName:"zujian3"*/"./zujian3.jsx"));
+
+
 
 
 /**
@@ -29,7 +32,7 @@ export default [
     {
         path:'/',
         exact:true,
-        component:Zujian1
+        component:Moren
     },
     {
         path:'/2',
@@ -49,6 +52,6 @@ export default [
     },
     {
         path:'/3',
-        component:Zujian3
+        component:Zujian2
     }
 ]
