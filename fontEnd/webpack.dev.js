@@ -34,29 +34,37 @@ module.exports = merge(common,{
     module: {
         rules: [
             {
-                test: /\.css$/,
+                test: /\.(css|less)$/,
                 use: [
                     // 插入内联样式
                     "style-loader", {
                         // 解析css
                         loader: "css-loader",
                         options: {
-                            modules: false,
+                            // modules: false,
                             // 定义类名，默认是［hash:base64］
                             // localIdentName: '[path][name]-[local]_[hash:base64:4]'
                         }
                     }, {
                         // 兼容css，相关配置在 postcss.config.js 里面
                         loader: "postcss-loader"
+                    },{
+                        loader:"less-loader"
                     }
                 ],
                 include:[
-                    path.resolve(__dirname,"./src")
-                ]
+                    path.resolve(__dirname,"node_modules/normalize.css"),
+                    path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"src")
+                ],
+                exclude:[]
+                
             },
         ]
     },
     plugins: [
+        // 它使用模块的相对路径作为模块的 id，
+        // 所以只要我们不重命名一个模块文件，那么它的id就不会变，更不会影响到其它模块
         new webpack.NamedModulesPlugin(),
         new webpack.HotModuleReplacementPlugin()
     ]

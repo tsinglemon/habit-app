@@ -1,5 +1,9 @@
 
-
+// 代码保存，浏览器局部刷新的关键代码，
+// 没这代码，代码保存后浏览器会全部刷新！！
+// 一般放在入口文件
+// 好东西！！很赞！！！
+if (module.hot) { module.hot.accept(); }
 
 import React, { Component } from "react";
 import ReactDom from "react-dom";
@@ -8,11 +12,6 @@ import { renderRoutes } from 'react-router-config';
 
 
 import luyous from './luyou.js'
-
-// import Zujian1 from "./zujian1.jsx"
-// import Zujian2 from "./zujian2.jsx"
-// import Zujian3 from "./zujian3.jsx"
-
 
 
 
@@ -24,11 +23,6 @@ ReactDom.render(
                 <Link to="/2">组件2 </Link>
                 <Link to="/3">组件3</Link>
                 {renderRoutes(luyous)}
-                {/* <Switch> */}
-                    {/* <Route exact path="/" component={Zujian1}></Route>
-                    <Route path="/2" component={Zujian2} ></Route>
-                    <Route path="/3" component={Zujian3}></Route> */}
-                {/* </Switch> */}
             </div>
         </BrowserRouter>
     </div>,

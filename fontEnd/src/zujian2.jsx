@@ -15,9 +15,6 @@ export default class extends Component{
                 <div>
                     <Link to="/2/a">跳a</Link>
                     {renderRoutes(this.props.route.routes)}
-                    {/* <Switch>
-                        <Route exact path={`${this.props.match.path}/a`} component={Zujian3} />
-                    </Switch> */}
                 </div>
             //  </BrowserRouter>
         )

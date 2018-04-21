@@ -47,8 +47,12 @@ module.exports = {
                     }
                 ],
                 include:[
-                    path.resolve(__dirname,"./src")
-                ]
+                    path.resolve(__dirname,"node_modules/normalize.css"),
+                    path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"node_modules/ansi-html"),
+                    path.resolve(__dirname,"src")
+                ],
+                exclude:[]
             },{
                 test: /\.(mp4|mp3|ico|jpg|jpeg|png|gif|svg|eot|otf|webp|ttf|woff|woff2)(\?.*)?$/,// "(\?.*)?"在问号后面可有可无一个或多个的任意字符
                 use: {
@@ -66,8 +70,11 @@ module.exports = {
                     }
                 },
                 include:[
-                    path.resolve(__dirname,"./src")
-                ]
+                    path.resolve(__dirname,"node_modules/normalize.css"),
+                    path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"src")
+                ],
+                exclude:[]
             }
         ]
     },
