@@ -1,35 +1,4 @@
-/*
-// 第一种写法
-import React, { Component } from "react";
 
-export default function asyncComponent(importComponent) {
-  class AsyncComponent extends Component {
-    constructor(props) {
-      super(props);
-
-      this.state = {
-        component: null
-      };
-    }
-
-    async componentDidMount() {
-      const { default: component } = await importComponent();
-
-      this.setState({
-        component: component
-      });
-    }
-
-    render() {
-      const C = this.state.component;
-
-      return C ? <C {...this.props} /> : null;
-    }
-  }
-
-  return AsyncComponent;
-}
-*/
 //第二种写法
 import React from 'react'
 export const asyncComponent = loadComponent => (
@@ -67,6 +36,7 @@ export const asyncComponent = loadComponent => (
 
 
 // 路由v4的按需加载 https://segmentfault.com/a/1190000009539836#articleHeader4
+//                 https://segmentfault.com/a/1190000009820646
 // 但报错“Uncaught ReferenceError: regeneratorRuntime is not defined”
 // 解决办法是添加babel预设 
 // https://www.jianshu.com/p/7a7f7abcddb5

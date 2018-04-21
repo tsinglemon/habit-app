@@ -3,7 +3,7 @@ import { renderRoutes } from 'react-router-config';
 
 console.log(888)
 
-export default class extends Component{
+export class Zujian extends Component{
     constructor(props){
         super(props)
         console.log(props)

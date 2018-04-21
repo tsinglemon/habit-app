@@ -11,7 +11,7 @@ export default class extends Component{
     }
     render() {
         return(
-             <BrowserRouter>
+            //  <BrowserRouter>
                 <div>
                     <Link to="/2/a">跳a</Link>
                     {renderRoutes(this.props.route.routes)}
@@ -19,7 +19,7 @@ export default class extends Component{
                         <Route exact path={`${this.props.match.path}/a`} component={Zujian3} />
                     </Switch> */}
                 </div>
-             </BrowserRouter>
+            //  </BrowserRouter>
         )
     }
 }
