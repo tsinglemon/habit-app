@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>习惯管理 </title>
+    <link href="/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="root">
+        <label id="register" for="">
+            <input type="text" placeholder="请输入账号">
+            <input type="password" placeholder="请输入密码">
+            <button>注册</button>
+        </label>
+        <br/>
+        <label id="login" for="">
+            <input type="text" placeholder="请输入账号">
+            <input type="password" placeholder="请输入密码">
+            <button>登录</button>
+        </label>
+        <label id="changePassword" for="">
+            <input type="text" placeholder="请输入账号">
+            <input type="password" placeholder="旧密码">
+            <input type="password" placeholder="新密码">
+            <button>修改</button>
+        </label>
+    </div>
+    <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
+    <!-- <script type="text/javascript" src="/app.js"></script> -->
+    <script src="/javascript/jquery-3.3.1.min.js"></script>
+    <script>
+
+        const regName = document.querySelector("#register input[type=text]");
+        const regPassword = document.querySelector("#register input[type=password]");
+        const regButton = document.querySelector('#register button');
+
+        const loginName = document.querySelector("#login input[type=text]");
+        const loginPassword = document.querySelector("#login input[type=password]");
+        const loginButton = document.querySelector('#login button');
+
+        const name = document.querySelector("#changePassword input[type=text]");
+        const oldPassword = document.querySelectorAll("#changePassword input[type=password]")[0];
+        const newPassword = document.querySelectorAll("#changePassword input[type=password]")[1];
+        const changePasswordButton = document.querySelector('#changePassword button');
+        regButton.onclick = () => {
+            $.post(
+                "http://localhost:3008/api/user/register", {
+                    name: regName.value,
+                    password: regPassword.value
+                },
+                function (data) {
+                    if(data.code!==0){
+                        return;
+                    }else{
+                        window.localStorage.setItem("token",data.token);
+                        console.log("注册并登录")
+                    }
+                })
+        }
+        loginButton.onclick = () => {
+            $.post(
+                "http://localhost:3008/api/user/login", {
+                    name: loginName.value,
+                    password: loginPassword.value
+                },
+                function (data) {
+                    if(data.code!==0){
+                        return;
+                    }else{
+                        window.localStorage.setItem("token",data.token);
+                        console.log("已登录")
+                    }
+                })
+        }
+        changePasswordButton.onclick = () => {
+            $.post(
+                "http://localhost:3008/api/user/changePassword", {
+                    name: name.value,
+                    oldPassword: oldPassword.value,
+                    newPassword: newPassword.value
+                },
+                function (data) {
+                    if(data.code!==0){
+                        return;
+                    }else{
+                        console.log("密码修改成功")
+                    }
+                })
+        }
+
+    </script>
+
+
+</body>
+
+</html>
