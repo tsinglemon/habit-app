@@ -5,18 +5,72 @@ const router = express.Router();
 const db = require('../models/db.js')
 const article = require('../models/article.js')
 const comments = require('../models/comments.js')
-router.get('/add', (req, res) => {
+const like = require('../models/like.js')
 
+
+router.get('/add', (req, res) => {
     comments.create({
         user: "张三",
-        comment: "张三的评论",
+        comments: "pinglun",
     }, (err, msg) => {
-        article.create({
-            title: "我是标题",
-            content: "我是内容",
-            guanlian: msg._id
+
+        var commentId = msg.id;
+        like.create({
+            likeUser: "我是like",
+            arr: []
         }, (err, msg) => {
-            res.json(msg)
+
+            var likeId = msg.id;
+
+
+            /**
+             * 向集合中指定的数组增加元素
+             */
+            // article.update({
+            //     "guanlian": '5aea8cc9777db58fa44b852e'
+            // },{
+            //     $push: {
+            //         "guanlian": '5aea8cbaf35f9d9d34cabac3'
+            //     }
+            // }, (err, msg) => {
+            //     res.json(msg)
+            // })
+
+            /**
+             * 删除集合中指定的元素
+             */
+            // article.update({
+            //     "guanlian": '5ae9c3b46b6cdf6d04ef6c81'
+            // },{
+            //     $pull: {
+            //         "guanlian": '5ae9c3b46b6cdf6d04ef6c81'
+            //     }
+            // }, (err, msg) => {
+            //     res.json(msg)
+            // })
+
+            /* 
+            * 修改集合指定数组的元素
+            * */
+            // article.update({
+            //         "guanlian": '5ae9c3b46b6cdf6d04ef6c80'
+            // },{$set:{
+            //     "guanlian.$": '5ae9c3b46b6cdf6d04ef6c89'
+            // }}, (err, msg) => {
+            //     res.json(msg)
+            // })
+
+            /**
+             * 给这个集合添加一条文档，这条文档引用了评论集合和点赞集合
+             */
+            article.create({
+                title: "我是标题",
+                content: "我是内容",
+                guanlian: commentId,
+                like: likeId
+            }, (err, msg) => {
+                res.json(likeId)
+            })
         })
     })
 })
@@ -28,8 +82,11 @@ router.get('/get', (req, res) => {
             select: { comment: 0 },
             // model: "comments"
             options: {
-                limit: 1
+                limit: 2
             }
+        }).
+        populate({
+            path: "like",
         }).
         exec((err, msg) => {
             if (err) throw err;

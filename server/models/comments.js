@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 // 评论表
 const option = {
     user: String,
-    comment: String
+    comments: String
 }
 const collectionName = "comments";
 const comments = db.model(collectionName,new Schema(option),collectionName);

@@ -7,12 +7,17 @@ const Schema = mongoose.Schema;
 // 文章，引入评论表
 const option = {
     title: String,
-    content: String,
-    guanlian: {
+    content: [String],
+    guanlian: [{
         // type: String,
         type: Schema.Types.ObjectId,
         ref: 'comments'
-    }
+    }],
+    like: [{
+        // type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'like'
+    }]
 }
 
 // 坑爹之旅：https://blog.csdn.net/azureternite/article/details/52349114

@@ -14,6 +14,7 @@ var option = {
     token:String
 }
 
-const user_security = db.model("user_security",new Schema(option))
+const collectionName = "user_security";
+const user_security = db.model(collectionName,new Schema(option),collectionName)
 
 module.exports = user_security;
