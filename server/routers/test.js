@@ -26,15 +26,15 @@ router.get('/add', (req, res) => {
             /**
              * 向集合中指定的数组增加元素
              */
-            // article.update({
-            //     "guanlian": '5aea8cc9777db58fa44b852e'
-            // },{
-            //     $push: {
-            //         "guanlian": '5aea8cbaf35f9d9d34cabac3'
-            //     }
-            // }, (err, msg) => {
-            //     res.json(msg)
-            // })
+            article.update({
+                "guanlian": '5aea8cc9777db58fa44b852e'
+            },{
+                $push: {
+                    "guanlian": '5aea8cbaf35f9d9d34cabac3'
+                }
+            }, (err, msg) => {
+                res.json(msg)
+            })
 
             /**
              * 删除集合中指定的元素
@@ -63,14 +63,14 @@ router.get('/add', (req, res) => {
             /**
              * 给这个集合添加一条文档，这条文档引用了评论集合和点赞集合
              */
-            article.create({
-                title: "我是标题",
-                content: "我是内容",
-                guanlian: commentId,
-                like: likeId
-            }, (err, msg) => {
-                res.json(likeId)
-            })
+            // article.create({
+            //     title: "我是标题",
+            //     content: "我是内容",
+            //     guanlian: commentId,
+            //     like: likeId
+            // }, (err, msg) => {
+            //     res.json(likeId)
+            // })
         })
     })
 })
@@ -79,7 +79,7 @@ router.get('/get', (req, res) => {
         // populate('guanlian','user').
         populate({
             path: 'guanlian',
-            select: { comment: 0 },
+            select: { comments: 0 },
             // model: "comments"
             options: {
                 limit: 2

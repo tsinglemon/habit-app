@@ -8,8 +8,8 @@ const app = express();
 
 // 连接students数据库
 const db = require('../models/db.js')
-const user_security = require('../models/user-security.js')
-const user_info = require('../models/user-info.js')
+const user_security = require('../models/user_security.js')
+const user_info = require('../models/user_info.js')
 
 // 用于加密签名的变量
 app.set('superSecret', "superSecret");
@@ -31,13 +31,20 @@ router.post('/register', (req, res) => {
             token = jwt.sign({ msg }, app.get('superSecret'), {
                 expiresIn: 60 * 60 * 24
             });
-            user_security.create({name, password, token }, (err, msg) => {
-                res.json({
-                    msg: "注册成功！",
-                    code: 0,
-                    token
+            user_security.create({ name, password, token }, (err, msg) => {
+
+                user_info.create({
+                    user: msg._id,
+                    headPic: "/images/default_head.jpg",
+                    attitude: "世界很美！"
+                }, (err, msg) => {
+                    res.json({
+                        msg: "注册成功！",
+                        code: 0,
+                        token
+                    })
                 })
-            })  
+            })
         }
     })
 })
@@ -52,7 +59,7 @@ router.post('/login', (req, res) => {
         } else if (msg.password !== password) {
             res.json({ msg: "密码错误", code: 2 });
         } else {
-            token = jwt.sign({ name,password }, app.get("superSecret"), {
+            token = jwt.sign({ name, password }, app.get("superSecret"), {
                 expiresIn: 60 * 60 * 24
             });
             // 登录成功后 更新token
@@ -78,11 +85,11 @@ router.post('/changePassword', (req, res) => {
         } else if (msg.password !== oldPassword) {
             res.json({ msg: "旧密码错误", code: 2 });
         } else {
-            token = jwt.sign({ name,password:newPassword }, app.get("superSecret"), {
+            token = jwt.sign({ name, password: newPassword }, app.get("superSecret"), {
                 expiresIn: 60 * 60 * 24
             });
             // 登录成功后 更新token
-            user_security.update({ name }, { token, password:newPassword }, function (err, msg) {
+            user_security.update({ name }, { token, password: newPassword }, function (err, msg) {
                 res.json({
                     token: token,
                     code: 0,

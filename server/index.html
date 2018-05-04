@@ -11,6 +11,7 @@
 
 <body>
     <div id="root">
+        <!-- 用户 -->
         <label id="register" for="">
             <input type="text" placeholder="请输入账号">
             <input type="password" placeholder="请输入密码">
@@ -28,12 +29,27 @@
             <input type="password" placeholder="新密码">
             <button>修改</button>
         </label>
+        <br>
+        <!-- 习惯 -->
+        <label id="habitRegister" for="">
+            <input type="text" placeholder="请输入习惯关键字">
+            <button>搜索</button>
+        </label>
+        <br>
+        <input type="file" name="recordImage">
+        <input type="file" name="recordImage">
+        <br>
+        <!-- <form action="/upload-single" method="post" enctype="multipart/form-data">
+            <h2>单图上传</h2>
+            <input type="file" name="logo">
+            <input type="submit" value="提交">
+        </form> -->
     </div>
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
     <!-- <script type="text/javascript" src="/app.js"></script> -->
     <script src="/javascript/jquery-3.3.1.min.js"></script>
     <script>
-
+        // 用户
         const regName = document.querySelector("#register input[type=text]");
         const regPassword = document.querySelector("#register input[type=password]");
         const regButton = document.querySelector('#register button');
@@ -46,6 +62,16 @@
         const oldPassword = document.querySelectorAll("#changePassword input[type=password]")[0];
         const newPassword = document.querySelectorAll("#changePassword input[type=password]")[1];
         const changePasswordButton = document.querySelector('#changePassword button');
+
+        // 习惯
+        const habitName = document.querySelector('#habitRegister input');
+        const habitSearch = document.querySelector('#habitRegister button');
+
+        //上传
+        const fileInput = document.querySelectorAll('input[type=file]');
+
+
+        // 用户
         regButton.onclick = () => {
             $.post(
                 "http://localhost:3008/api/user/register", {
@@ -53,10 +79,10 @@
                     password: regPassword.value
                 },
                 function (data) {
-                    if(data.code!==0){
+                    if (data.code !== 0) {
                         return;
-                    }else{
-                        window.localStorage.setItem("token",data.token);
+                    } else {
+                        window.localStorage.setItem("token", data.token);
                         console.log("注册并登录")
                     }
                 })
@@ -68,10 +94,10 @@
                     password: loginPassword.value
                 },
                 function (data) {
-                    if(data.code!==0){
+                    if (data.code !== 0) {
                         return;
-                    }else{
-                        window.localStorage.setItem("token",data.token);
+                    } else {
+                        window.localStorage.setItem("token", data.token);
                         console.log("已登录")
                     }
                 })
@@ -84,12 +110,58 @@
                     newPassword: newPassword.value
                 },
                 function (data) {
-                    if(data.code!==0){
+                    if (data.code !== 0) {
                         return;
-                    }else{
+                    } else {
                         console.log("密码修改成功")
                     }
                 })
+        }
+
+
+
+        // 习惯
+        habitSearch.onclick = () => {
+            // console.dir(fileInput.file)
+            // return;
+            let image = fileInput[0].files[0];
+            let image2 = fileInput[1].files[0];
+            // console.log(image)
+            // return;
+            let formData = new FormData();
+            if (image) {
+
+                formData.append("userId", "5aebd9db67ca48e2cc6f2440")
+                formData.append("habitId", "5aeb3875fd329cf1487bf510")
+                formData.append("text", "我是文本")
+
+                var arr = [image,image2];
+                for(var i=0;i<1;i++){
+                    formData.append("recordImage", arr[i])    
+                }
+                
+
+                $.ajax({
+                    url: "http://localhost:3008/api/habit/record",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    
+                    success: function(msg){
+                        console.log(msg)
+                    },
+                    error: function(err){
+                        console.log("错误信息:"+JSON.stringify(err))
+                    }
+                })
+            }
+            // http://www.jb51.net/article/99505.htm
+
+
+
+
+
         }
 
     </script>
