@@ -22,18 +22,24 @@ const option = {
         type: Date,
         default: Date.now
     },
-    likes: [{
+    // 点赞的人
+    praise: [{
         type: Schema.Types.ObjectId,
         ref: "user_security"
     }],
-    likeCount: Number,
+    praiseCount: Number,
     comment: [{
+        otherUser:{
+            type: Schema.Types.ObjectId,
+            ref: "user_security"
+        },
         user: {
             type: Schema.Types.ObjectId,
             ref: "user_security"
         },
         content: String
-    }]
+    }],
+    commentCount: Number
 }
 const collectionName = "habit_record";
 const habit_record = db.model(collectionName, new Schema(option), collectionName);

@@ -33,17 +33,30 @@
         <!-- 习惯 -->
         <label id="habitRegister" for="">
             <input type="text" placeholder="请输入习惯关键字">
-            <button>搜索</button>
+            <button>添加</button>
         </label>
         <br>
-        <input type="file" name="recordImage">
-        <input type="file" name="recordImage">
+        <!-- 发表图文记录 -->
+        <label id="record" for="">
+            <input type="text" placeholder="说几句话">
+            <input type="file" name="recordImage">
+            <button>发布</button>
+        </label>
         <br>
-        <!-- <form action="/upload-single" method="post" enctype="multipart/form-data">
-            <h2>单图上传</h2>
-            <input type="file" name="logo">
-            <input type="submit" value="提交">
-        </form> -->
+        <br>
+        <!-- 点赞 -->
+        <input id='like' type="button" name="" value="点赞">
+        <!-- 评论 -->
+        <br>
+        <label id="comment" for="">
+            <input type="text" placeholder="评论">
+            <button>评论</button>
+        </label>
+        <br>
+        <label id="delComment" for="">
+            <input type="button" value="删评论">
+        </label>
+
     </div>
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
     <!-- <script type="text/javascript" src="/app.js"></script> -->
@@ -63,12 +76,7 @@
         const newPassword = document.querySelectorAll("#changePassword input[type=password]")[1];
         const changePasswordButton = document.querySelector('#changePassword button');
 
-        // 习惯
-        const habitName = document.querySelector('#habitRegister input');
-        const habitSearch = document.querySelector('#habitRegister button');
 
-        //上传
-        const fileInput = document.querySelectorAll('input[type=file]');
 
 
         // 用户
@@ -118,28 +126,39 @@
                 })
         }
 
+        // 创建/添加/删除习惯
+        $('#habitRegister button').click((e) => {
+            $.get("http://localhost:3008/api/habit/addHabit",{
+                habitName: $('#habitRegister input').val(),
+                userId: "5aede8a202f25993ec1902f2",
+                habitId: "5aedc78687cfad73641f347e"
+            })
+            .done((data)=>{
+                console.log(data)
+            })
+            .fail((err)=>{
+                console.log(err)
+            })
+        })
 
-
-        // 习惯
-        habitSearch.onclick = () => {
+        // 添加/删除图文记录
+        $('#record button').click((e)=>{
             // console.dir(fileInput.file)
-            // return;
-            let image = fileInput[0].files[0];
-            let image2 = fileInput[1].files[0];
-            // console.log(image)
-            // return;
+            
+            let file = $("#record input[type=file]")[0].files[0]
+            let text = $("#record input[type=text]").val()
             let formData = new FormData();
-            if (image) {
+            if (file) {
 
-                formData.append("userId", "5aebd9db67ca48e2cc6f2440")
-                formData.append("habitId", "5aeb3875fd329cf1487bf510")
-                formData.append("text", "我是文本")
+                formData.append("userId", "5aed9761c5f50069bc0360d2")
+                formData.append("habitId", "5aedc78687cfad73641f347e")
+                formData.append("text", text)
 
-                var arr = [image,image2];
-                for(var i=0;i<1;i++){
-                    formData.append("recordImage", arr[i])    
-                }
-                
+                // for (var i = 0; i < 1; i++) {
+                //     formData.append("recordImage", image)
+                // }
+                formData.append("recordImage", file)
+
 
                 $.ajax({
                     url: "http://localhost:3008/api/habit/record",
@@ -147,22 +166,58 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    
-                    success: function(msg){
+
+                    success: function (msg) {
                         console.log(msg)
                     },
-                    error: function(err){
-                        console.log("错误信息:"+JSON.stringify(err))
+                    error: function (err) {
+                        console.log("错误信息:" + JSON.stringify(err))
                     }
                 })
             }
             // http://www.jb51.net/article/99505.htm
 
+        })
 
 
+        // 点/取消赞
+        $('#like').click((e) => {
+            $.get(
+                "http://localhost:3008/api/habit/like", {
 
+                    userId: "5aed9761c5f50069bc0360d2",
+                    recordId: "5aed9812c5f50069bc0360d4"
+                },
+                function (data) {
+                    console.log(data)
+                })
+        })
 
-        }
+        // 添加/删除评论
+        $("#comment button").click((e) => {
+            $.get(
+                "http://localhost:3008/api/habit/comment", {
+                    recordId: "5aed9812c5f50069bc0360d4",
+                    userId: "5aed5e15101f7e12d48bf8c9",
+                    otherUserId: "",
+                    content: $('#comment input').val()
+                },
+                function (data) {
+                    console.log(data)
+                })
+        })
+        // 添加/删除回复
+        $("#delComment input").click((e) => {
+            $.get(
+                "http://localhost:3008/api/habit/delComment", {
+                    userId: "5aed9751c5f50069bc0360cc",
+                    recordId: "5aed5de2101f7e12d48bf8c8",
+                    commentId: "5aed640eaef6ff4d08f4ee19"
+                },
+                function (data) {
+                    console.log(data)
+                })
+        })
 
     </script>
 

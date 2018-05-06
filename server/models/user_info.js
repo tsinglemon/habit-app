@@ -28,8 +28,16 @@ var option = {
             type: Date,
             default: Date.now
         },
-        count: Number
-    }]
+        date: [{
+            type: Date,
+            default: Date.now
+        }],
+        count: Number,
+        isClockIn: Boolean
+    }],
+    collect: [],
+    
+
 }
 const collectionName = "user_info";
 const user_info = db.model(collectionName, new Schema(option), collectionName)
