@@ -56,6 +56,10 @@
         <label id="delComment" for="">
             <input type="button" value="删评论">
         </label>
+        <br>
+        <label id="attention" for="">
+            <input type="button" value="关注">
+        </label>
 
     </div>
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
@@ -128,23 +132,23 @@
 
         // 创建/添加/删除习惯
         $('#habitRegister button').click((e) => {
-            $.get("http://localhost:3008/api/habit/addHabit",{
+            $.get("http://localhost:3008/api/habit/addHabit", {
                 habitName: $('#habitRegister input').val(),
                 userId: "5aede8a202f25993ec1902f2",
                 habitId: "5aedc78687cfad73641f347e"
             })
-            .done((data)=>{
-                console.log(data)
-            })
-            .fail((err)=>{
-                console.log(err)
-            })
+                .done((data) => {
+                    console.log(data)
+                })
+                .fail((err) => {
+                    console.log(err)
+                })
         })
 
         // 添加/删除图文记录
-        $('#record button').click((e)=>{
+        $('#record button').click((e) => {
             // console.dir(fileInput.file)
-            
+
             let file = $("#record input[type=file]")[0].files[0]
             let text = $("#record input[type=text]").val()
             let formData = new FormData();
@@ -219,9 +223,25 @@
                 })
         })
 
+        // 关注/取消关注
+        $("#attention input").click((e) => {
+            $.get(
+                "http://localhost:3008/api/habit/attention", {
+                    userId: "5aede8a202f25993ec1902f2",
+                    attention: "5aede6ee522ac98d08e34063"
+                    // userId: "5aede6ee522ac98d08e34063",
+                    // attention: "5aede8a202f25993ec1902f2"
+                },
+                function (data) {
+                    console.log(data)
+                })
+        })
+
+/**
+ * 没关注你时
+ * 关注你时
+*/
     </script>
-
-
 </body>
 
 </html>

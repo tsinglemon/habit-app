@@ -37,6 +37,7 @@ const db = require('../models/db.js')
 const habit_all = require('../models/habit_all.js')
 const habit_record = require('../models/habit_record.js')
 const user_info = require('../models/user_info.js')
+const user_attention = require('../models/user_attention.js')
 
 
 
@@ -166,7 +167,7 @@ router.get('/delHabit', (req, res) => {
         user: userId,
         "habits.habit": habitId
     }, (err, msg) => {
-        if (msg === null) {
+        if (!msg) {
             res.json({
                 code: 1,
                 msg: "您还没添加该习惯"
@@ -457,11 +458,129 @@ router.get('/init', (req, res) => {
                 })
             res.json("重置签到状态")
         }
-
-
-
         res.json(msg[0].habits[0])
+    })
+})
 
+// 关注
+/**
+ * 先查一下关注的人有没有关注过自己，如果没有 就先看看自己有没有文档，如果有就修改，没有就创建
+ * 如果对方有创建过，就记录对方的isLike作为相互关注的依据，然后同样先判断自己有没有文档，如果有就修改，没有就创建
+ */
+router.get('/attention', (req, res) => {
+    let userId = req.query.userId
+    let attentionId = req.query.attention
+
+    user_attention.findOne({
+        user: attentionId,
+        attention: userId
+    }, (err, msg) => {
+        // 如果对方从来没有关注你
+        if (!msg) {
+            user_attention.findOne({
+                user: userId,
+                attention: attentionId
+            }, (err, msg) => {
+                if (msg) {
+                    let selfIsLike = !msg.state.isLike;
+                    user_attention.update({
+                        user: userId,
+                        attention: attentionId
+                    }, {
+                            $set: {
+                                "state.isLike": selfIsLike
+                            }
+                        }, (err, msg) => {
+                            res.json({
+                                msg: selfIsLike ? "成功关注" : "取消关注"
+                            })
+                        })
+                } else {
+                    user_attention.create({
+                        user: userId,
+                        attention: attentionId,
+                        "state.isLike": true,
+                        "state.mutual": false,
+                    }, (err, msg) => {
+                        res.json({
+                            msg: "成功关注"
+                        })
+                    })
+                }
+            })
+        }
+        // 如果对方曾经或现在关注过你
+        else {
+            let otherLike = msg.state.isLike
+            user_attention.findOne({
+                user: userId,
+                attention: attentionId
+            }, (err, msg) => {
+                // 如果已经存在自己的关注记录
+                if (msg) {
+                    let selfIsLike = !msg.state.isLike;
+                    user_attention.update({
+                        user: userId,
+                        attention: attentionId
+                    }, {
+                            $set: {
+                                "state.isLike": selfIsLike
+                            }
+                        }, (err, msg) => { })
+
+                    // 修改自己的相互关注状态
+                    user_attention.update({
+                        user: userId,
+                        attention: attentionId
+                    }, {
+                            $set: {
+                                "state.mutual": otherLike && selfIsLike
+                            }
+                        }, (err, msg) => { })
+
+                    // 修改对方的相互关注状态
+                    user_attention.update({
+                        user: attentionId,
+                        attention: userId
+                    }, {
+                            $set: {
+                                "state.mutual": otherLike && selfIsLike
+                            }
+                        }, (err, msg) => {
+                            res.json({
+                                msg: selfIsLike ? "相互关注成功" : "取消关注成功"
+                            })
+                        })
+                        
+                } else {
+                    user_attention.create({
+                        user: userId,
+                        attention: attentionId,
+                        "state.isLike": true,
+                        "state.mutual": otherLike,
+                    }, (err, msg) => {
+                        res.json({
+                            msg: "成功关注"
+                        })
+                    })
+                }
+            })
+        }
+    })
+})
+
+// 获取已关注
+router.get('/getFans', (req, res) => {
+    // let userId = req.query.userId;
+    // let attentionId = req.query.attentionId;
+
+    let userId = "5aede6ee522ac98d08e34063"
+    let attention = "5aede8a202f25993ec1902f2"
+    user_attention.find({
+        attention: userId,
+        // "state.isLike":true
+    }, (err, msg) => {
+        res.json(msg)
     })
 })
 
