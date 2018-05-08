@@ -551,7 +551,7 @@ router.get('/attention', (req, res) => {
                                 msg: selfIsLike ? "相互关注成功" : "取消关注成功"
                             })
                         })
-                        
+
                 } else {
                     user_attention.create({
                         user: userId,
@@ -574,8 +574,8 @@ router.get('/getFans', (req, res) => {
     // let userId = req.query.userId;
     // let attentionId = req.query.attentionId;
 
-    let userId = "5aede6ee522ac98d08e34063"
-    let attention = "5aede8a202f25993ec1902f2"
+    let userId = "5aede8a202f25993ec1902f2"
+    let attention = "5aede517d145309110b2bf55"
     user_attention.find({
         attention: userId,
         // "state.isLike":true
@@ -583,10 +583,91 @@ router.get('/getFans', (req, res) => {
         res.json(msg)
     })
 })
+// 查看别人的关注列表，除了返回他关注的人，还需要返回关注的人跟自己的关注关系
+router.get('/getOtherList', (req, res) => {
+    // let userId = req.query.userId;
+    // let attentionId = req.query.attentionId;
+
+    let otherId = "5aede8a202f25993ec1902f2"
+    let myId = "5aede6ee522ac98d08e34063"
+
+    let result = [];
+    let obj = {}
+    user_attention.find({
+        user: otherId
+    }, (err, msg) => {
+        let msgLength = msg.length;
+
+        // 找出对方关注列表的人，然后返回这些人跟自己的关系和其他相关数据
+        msg.map((item, index) => {
+            let otherAttention = item.attention;
+            user_attention.findOne({
+                user: myId,
+                attention: otherAttention
+            },(err,msg)=>{
+                if(msg){
+                    obj = {
+                        user: myId,
+                        attention: otherAttention,
+                        state: msg.state
+                    }
+                }
+                // 如果没有这条文档，那肯定没有关注过，也就不可能会有互粉这些
+                else{
+                    obj = {
+                        user: myId,
+                        attention: otherAttention,
+                        state: {isLike:false,mutual:false}
+                    }
+                }
+                result.push(obj);
+                // 没有用propmis，简单粗暴用这个解决异步查询
+                if(index>=msgLength-1){
+                    res.json(result)
+                }
+            })
+        })
+    })
+
+})
 
 
 
 
+// study
+// https://segmentfault.com/q/1010000009968546
+/*
+let result = []; //存放查询结果
+let doc1 = []; //存放第一次查询的结果
+model.WithdrawModel.find({ status: 'processing' }).exec().then((doc) => {
+    doc1 = doc;
+    const promises = doc.map(item => model.UserModel.findOne({ phone: item.phone }, 'name IDcard bank bankCard bank_area bank_name'));
+    return Promise.all(promises);
+})
+    .then((bankInfoList) => {//promise.all返回的结果是一一对应的
+        for (let i = 0; i < doc1.length; i++) {
+            let obj = {};
+
+            Object.assign(obj, JSON.parse(JSON.stringify(doc1[i])), JSON.parse(JSON.stringify(bankInfoList[i])));
+            result.push(obj);
+        }
+        return new Promise((resolve, reject) => {
+            resolve(result);
+        })
+    })
+    .then((result) => {
+        return new Promise(() => {
+            res.json({ code: 0, msg: '查询成功', result: result });
+            return;
+        });
+    })
+    .catch((e) => {
+        console.log(e);
+        res.json({ code: -1, msg: '查询失败' });
+        return;
+    });
+
+*/
 
 
 
