@@ -65,6 +65,7 @@
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
     <!-- <script type="text/javascript" src="/app.js"></script> -->
     <script src="/javascript/jquery-3.3.1.min.js"></script>
+    <script src="/javascript/socket.io.js"></script>
     <script>
         // 用户
         const regName = document.querySelector("#register input[type=text]");
@@ -237,6 +238,17 @@
                 })
         })
 
+        // 聊天
+
+        var socket = io({
+
+        });
+        socket.on('connect', (socket) => {
+            console.log("成功连接服务端")
+        })
+        socket.on("client", (data) => {
+            console.log(data)
+        })
 /**
  * 没关注你时
  * 关注你时

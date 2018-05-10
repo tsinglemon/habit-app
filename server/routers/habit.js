@@ -628,46 +628,14 @@ router.get('/getOtherList', (req, res) => {
             })
         })
     })
-
 })
 
 
 
 
-// study
-// https://segmentfault.com/q/1010000009968546
-/*
-let result = []; //存放查询结果
-let doc1 = []; //存放第一次查询的结果
-model.WithdrawModel.find({ status: 'processing' }).exec().then((doc) => {
-    doc1 = doc;
-    const promises = doc.map(item => model.UserModel.findOne({ phone: item.phone }, 'name IDcard bank bankCard bank_area bank_name'));
-    return Promise.all(promises);
-})
-    .then((bankInfoList) => {//promise.all返回的结果是一一对应的
-        for (let i = 0; i < doc1.length; i++) {
-            let obj = {};
 
-            Object.assign(obj, JSON.parse(JSON.stringify(doc1[i])), JSON.parse(JSON.stringify(bankInfoList[i])));
-            result.push(obj);
-        }
-        return new Promise((resolve, reject) => {
-            resolve(result);
-        })
-    })
-    .then((result) => {
-        return new Promise(() => {
-            res.json({ code: 0, msg: '查询成功', result: result });
-            return;
-        });
-    })
-    .catch((e) => {
-        console.log(e);
-        res.json({ code: -1, msg: '查询失败' });
-        return;
-    });
 
-*/
+
 
 
 
