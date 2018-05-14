@@ -60,6 +60,8 @@
         <label id="attention" for="">
             <input type="button" value="关注">
         </label>
+        <input id="qunfaText" type="text">
+        <button id="qunfa">群发</button>
 
     </div>
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
@@ -240,19 +242,40 @@
 
         // 聊天
 
-        var socket = io({
-
+        var socket = io('http://localhost:3008',{
+            // 客户端可设置的参数参考 https://socket.io/docs/client-api/#new-manager-url-options
+            // path: "/abc",
+            // query: {
+            //     token: 2223322
+            // },
+            // autoConnect: false
         });
-        socket.on('connect', (socket) => {
-            console.log("成功连接服务端")
+        
+        // var socket = io.connect("http://localhost:3008")
+
+        // socket相关事件
+        socket.on('disconnect', () => {
+            console.log('连接断开') 
+        });
+        socket.on('connect', (d) => {
+            console.log(socket.id)
         })
-        socket.on("client", (data) => {
-            console.log(data)
+        socket.on('message',(msg)=>{
+            console.log(msg)
         })
-/**
- * 没关注你时
- * 关注你时
-*/
+        $('#qunfa').click((e)=>{
+            let val = +$('#qunfaText').val();
+            socket.send(val)    
+        })
+        
+        socket.on('j',(msg)=>{
+            console.log(msg)
+        })
+        // socket.open();
+        // setTimeout(() => {
+        //     socket.close()
+        // }, 2000)
+
     </script>
 </body>
 

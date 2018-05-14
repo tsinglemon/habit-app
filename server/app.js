@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname, 'static')));
 
 const apis = require('./routers/index.js');
 const chat = require('./routers/chat.js');
-app.use('/api',apis)
-app.use('/chat',chat)
+app.use('/api',apis) 
+
 // 写一个方法用来传递server给chat路由
 app.chatReady = (server)=>{
     chat.prepareSocketIO(server);
