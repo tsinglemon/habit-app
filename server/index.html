@@ -62,6 +62,9 @@
         </label>
         <input id="qunfaText" type="text">
         <button id="qunfa">群发</button>
+        <br>
+        <input id="initName" placeholder="名字" type="text">
+        <button id="initBtn">起名</button>
 
     </div>
     <!-- <script type="text/javascript" src="/javascript/common.js"></script> -->
@@ -264,11 +267,18 @@
             console.log(msg)
         })
         $('#qunfa').click((e)=>{
-            let val = +$('#qunfaText').val();
+            let val = ""+$('#qunfaText').val();
             socket.send(val)    
+        })
+        $('#initBtn').click((e)=>{
+            let val = ""+$('#initName').val();
+            socket.emit('init',val)
         })
         
         socket.on('j',(msg)=>{
+            console.log(msg)
+        })
+        socket.on('chat',(msg)=>{
             console.log(msg)
         })
         // socket.open();

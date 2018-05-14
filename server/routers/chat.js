@@ -53,11 +53,23 @@ router.prepareSocketIO = function (server) {
     //     }
     // })
     let rooms = []
+    let users = {}
     io.sockets.on('connection', (socket) => {
         console.log("成功连接客户端")
         socket.on('disconnect', (socket) => {
             console.log('断开连接')
         })
+
+        // 给每个连接进来的用户建立socket映射
+        socket.on('init',(msg)=>{
+            
+            users[msg] = socket;
+            console.log(msg)
+        })
+        
+        
+
+
         // console.log(socket.request.headers.referer)
         let url = socket.request.headers.referer;
         let roomName = url.split('/chat/room/')[1]
@@ -68,10 +80,12 @@ router.prepareSocketIO = function (server) {
 
         socket.join(roomName)
         
-        io.in(roomName).emit('j',rooms)
+        // io.in(roomName).emit('j',rooms)
 
         socket.on('message',(msg)=>{
-            io.in(msg).emit('j',"我在这个房间说话："+msg)
+            users[msg].emit('chat',"给"+msg+"捎了句话")
+            // io.in(msg).emit('j',"我在这个房间说话："+msg)
+            
         })
 
         // console.log(socket.request.headers.referer)
