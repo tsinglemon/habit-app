@@ -9,7 +9,7 @@ import React, { Component } from "react";
 import ReactDom from "react-dom";
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
-
+import axios from 'axios'
 
 import luyous from './luyou.js'
 
