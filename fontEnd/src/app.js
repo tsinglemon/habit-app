@@ -7,11 +7,12 @@ if (module.hot) { module.hot.accept(); }
 
 import React, { Component } from "react";
 import ReactDom from "react-dom";
+import { Provider } from 'react-redux';
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
 import axios from 'axios'
 
-import luyous from './luyou.js'
+import routers from './routers/index.js';
 
 
 
@@ -19,10 +20,7 @@ ReactDom.render(
     <div>
         <BrowserRouter>
             <div>
-                <Link to="/">组件1 </Link>
-                <Link to="/2">组件2 </Link>
-                <Link to="/3">组件3</Link>
-                {renderRoutes(luyous)}
+                {renderRoutes(routers)}
             </div>
         </BrowserRouter>
     </div>,

@@ -2,7 +2,7 @@
 
 
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
-import Zujian1 from "./zujian1.jsx"
+import Zujian1,{Demo} from "./zujian1.jsx"
 import Zujian2 from "./zujian2.jsx"
 
 
@@ -22,7 +22,7 @@ export default [
         routes:[
             {
                 path:'/2/a',
-                component:Zujian1,
+                component:Demo,
                 routes:[
                     {
                         path:'/2/a/9',

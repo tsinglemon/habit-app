@@ -41,7 +41,7 @@ module.exports = merge(common,{
                         // 解析css
                         loader: "css-loader",
                         options: {
-                            // modules: false,
+                            modules: false,
                             // 定义类名，默认是［hash:base64］
                             // localIdentName: '[path][name]-[local]_[hash:base64:4]'
                         }
@@ -52,13 +52,42 @@ module.exports = merge(common,{
                         loader:"less-loader"
                     }
                 ],
+                // 引入的包不使用
                 include:[
                     path.resolve(__dirname,"node_modules/normalize.css"),
                     path.resolve(__dirname,"node_modules/antd-mobile"),
-                    path.resolve(__dirname,"src")
+                    path.resolve(__dirname,"src/static/fonts"),
+                    path.resolve(__dirname,"src/static/stylesheet")
                 ],
                 exclude:[]
                 
+            },
+            // 自己写的样式使用模块化
+            {
+                test: /\.(css|less)$/,
+                use: [
+                    // 插入内联样式
+                    "style-loader", {
+                        // 解析css
+                        loader: "css-loader",
+                        options: {
+                            modules: true,
+                            // 定义类名，默认是［hash:base64］
+                            // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+                            localIdentName: '[name]-[local]_[hash:base64:4]'
+                        }
+                    }, {
+                        // 兼容css，相关配置在 postcss.config.js 里面
+                        loader: "postcss-loader"
+                    },{
+                        loader:"less-loader"
+                    }
+                ],
+                include:[
+                    path.resolve(__dirname,"src/component-container"),
+                    path.resolve(__dirname,"src/component-show"),
+                ],
+                exclude:[]
             },
         ]
     },

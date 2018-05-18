@@ -1,0 +1,139 @@
+
+/* 图文记录的样式 */
+
+.detail_wrap {
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 4px;
+}
+.head_wrap {
+    display:flex;
+    flex-flow:row nowrap;
+    justify-content:space-between  ;
+    padding:15px 15px 0;
+}
+.test {
+    background: #f40
+}
+.head_userInfo {
+    display:flex;
+    flex-flow:row nowrap;
+}
+.head_pic {
+    width:50px;
+    height: 50px;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 50%;
+}
+.head_pic:before {
+    content:"";
+    display:inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+.head_pic img {
+    display:inline-block;
+    vertical-align: middle;
+    max-width:100%;
+}
+.head_description {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+}
+.head_userName {
+    margin-bottom:6px;
+    font-size: 16px;
+    color:#333;
+}
+.head_habit {
+    font-size:14px;
+    color:#999;
+}
+.head_habitLink {
+    color:#39cc7b;
+    /* background: black(.2) */
+}
+.head_habitLink:active {
+    background: #39cc7b.2;
+}
+.head_date {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    text-align: right;
+}
+.head_time {
+    margin-bottom:6px;
+    color:#999;
+}
+.head_day {
+    color:#39cc7b;
+}
+
+/* body */
+.body_wrap {
+    margin-top:10px;
+}
+.body_img {
+    width:100%;
+    max-height:250px; 
+    overflow: hidden;
+    text-align: center;
+}
+.body_img:before {
+    content:"";
+    display:inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+.body_img img{
+    display:inline-block;
+    vertical-align: middle;
+    max-width:100%;
+}
+.body_description {
+    padding:15px 15px;
+    color:#333
+}
+
+/* footer */
+.footer_wrap {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    align-items: center;
+    margin-top:6px;
+    padding:8px 0;
+    border-top:1px solid #eee;
+}
+.footer_wrap span {
+    color:#999
+}
+.footer_item {
+    display: inline-block;
+    padding-left:4px;
+    font-size:14px;
+    vertical-align: middle;
+    font-style: normal;
+    color:#999;
+}
+.footer_item:before {
+    display: inline-block;
+    vertical-align: middle;
+    color:#999;
+}
+.footer_abc {
+    color:#ffffff;
+}
+/* 评论弹窗 */
+.comment_title {
+    display: flex;
+    justify-content: space-between;
+    font-size:16px;
+}
+.comment_size {
+    max-height:360px;
+    min-height: 360px;
+}

@@ -11,6 +11,7 @@ const PostcssPseudoelements = require('postcss-pseudoelements')
 const PostcssVmin = require('postcss-vmin')
 const Pixrem = require('pixrem')
 const PostcssWillChange = require('postcss-will-change')
+const PostcssColorAlpha= require('postcss-color-alpha')
 
 
 
@@ -30,7 +31,7 @@ module.exports = {
         PostcssPseudoelements(),
         PostcssVmin(),
         Pixrem(),
-        PostcssWillChange()
-
+        PostcssWillChange(),
+        PostcssColorAlpha()
     ]
 }
