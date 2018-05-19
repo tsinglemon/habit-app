@@ -19,7 +19,7 @@ module.exports = {
         // 输出的文件名，如果有多个文件就用方括号表示不同的文件名
         filename: "[name].js",
         // 设置按需加载的文件名
-        chunkFilename: 'static/javascript/chunk/[name].chunk.js',
+        chunkFilename: 'static/javascript/delayChunk/[name].chunk.js',
     },
     // 解析
     resolve: {
@@ -47,8 +47,6 @@ module.exports = {
                     }
                 ],
                 include:[
-                    // path.resolve(__dirname,"node_modules/antd-mobile"),
-                    // path.resolve(__dirname,"node_modules/ansi-html"),
                     path.resolve(__dirname,"src")
                 ],
                 exclude:[]
@@ -69,8 +67,6 @@ module.exports = {
                     }
                 },
                 include:[
-                    // path.resolve(__dirname,"node_modules/normalize.css"),
-                    // path.resolve(__dirname,"node_modules/antd-mobile"),
                     path.resolve(__dirname,"src/static/images")
                 ],
                 exclude:[]
@@ -92,8 +88,6 @@ module.exports = {
                     }
                 },
                 include:[
-                    // path.resolve(__dirname,"node_modules/normalize.css"),
-                    // path.resolve(__dirname,"node_modules/antd-mobile"),
                     path.resolve(__dirname,"src/static/fonts")
                 ],
                 exclude:[]
