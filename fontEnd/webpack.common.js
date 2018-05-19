@@ -19,7 +19,7 @@ module.exports = {
         // 输出的文件名，如果有多个文件就用方括号表示不同的文件名
         filename: "[name].js",
         // 设置按需加载的文件名
-        chunkFilename: 'javascript/[name].chunk.js',
+        chunkFilename: 'static/javascript/chunk/[name].chunk.js',
     },
     // 解析
     resolve: {
@@ -47,14 +47,13 @@ module.exports = {
                     }
                 ],
                 include:[
-                    path.resolve(__dirname,"node_modules/normalize.css"),
-                    path.resolve(__dirname,"node_modules/antd-mobile"),
-                    path.resolve(__dirname,"node_modules/ansi-html"),
+                    // path.resolve(__dirname,"node_modules/antd-mobile"),
+                    // path.resolve(__dirname,"node_modules/ansi-html"),
                     path.resolve(__dirname,"src")
                 ],
                 exclude:[]
             },{
-                test: /\.(mp4|mp3|ico|jpg|jpeg|png|gif|svg|eot|otf|webp|ttf|woff|woff2)(\?.*)?$/,// "(\?.*)?"在问号后面可有可无一个或多个的任意字符
+                test: /\.(ico|jpg|jpeg|png|gif|svg)(\?.*)?$/,// "(\?.*)?"在问号后面可有可无一个或多个的任意字符
                 use: {
                     loader: "url-loader",
                     options: {
@@ -64,15 +63,38 @@ module.exports = {
                         // 单位是字节，小于该字节将转换成 DataURL 格式
                         limit: 2048,
                         // 配置输出的目录
-                        outputPath: "assets",
+                        outputPath: "static",
                         // 配置文件名和格式，当然也可以定义目录
-                        name: "[name].[ext]"
+                        name: "images/[name].[ext]"
                     }
                 },
                 include:[
-                    path.resolve(__dirname,"node_modules/normalize.css"),
-                    path.resolve(__dirname,"node_modules/antd-mobile"),
-                    path.resolve(__dirname,"src")
+                    // path.resolve(__dirname,"node_modules/normalize.css"),
+                    // path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"src/static/images")
+                ],
+                exclude:[]
+            },
+            {
+                test: /\.(js|svg|eot|otf|webp|ttf|woff|woff2)(\?.*)?$/,// "(\?.*)?"在问号后面可有可无一个或多个的任意字符
+                use: {
+                    loader: "url-loader",
+                    options: {
+                        // 如果不满足limit，将回退使用 file-loader，默认也是file-loader
+                        // file-loader 让webpack以文件的形式释放所需的对象，并返回其公共URL
+                        fallback: "file-loader",
+                        // 单位是字节，小于该字节将转换成 DataURL 格式
+                        limit: 2048,
+                        // 配置输出的目录
+                        outputPath: "static",
+                        // 配置文件名和格式，当然也可以定义目录
+                        name: "fonts/[name].[ext]"
+                    }
+                },
+                include:[
+                    // path.resolve(__dirname,"node_modules/normalize.css"),
+                    // path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"src/static/fonts")
                 ],
                 exclude:[]
             }

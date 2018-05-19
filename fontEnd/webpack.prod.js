@@ -9,14 +9,81 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const extractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
+const extract_iconfont = new extractTextPlugin({
+    filename: "static/fonts/iconfont.css"
+})
+const extract_index = new extractTextPlugin({
+    filename: "static/stylesheet/index.css"
+})
+const extract_module = new extractTextPlugin({
+    filename: "static/stylesheet/module.css"
+})
 
 module.exports = merge(common, {
     devtool: "none",
     module: {
         rules: [
+
+            // {
+            //     test: /\.(css|less)$/,
+            //     use: [
+            //         // 插入内联样式
+            //         "style-loader", {
+            //             // 解析css
+            //             loader: "css-loader",
+            //             options: {
+            //                 modules: false,
+            //                 // 定义类名，默认是［hash:base64］
+            //                 // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+            //             }
+            //         }, {
+            //             // 兼容css，相关配置在 postcss.config.js 里面
+            //             loader: "postcss-loader"
+            //         },{
+            //             loader:"less-loader"
+            //         }
+            //     ],
+            //     // 引入的包不使用
+            //     include:[
+            //         path.resolve(__dirname,"node_modules/normalize.css"),
+            //         path.resolve(__dirname,"node_modules/antd-mobile"),
+            //         path.resolve(__dirname,"src/static/fonts"),
+            //         path.resolve(__dirname,"src/static/stylesheet")
+            //     ],
+            //     exclude:[]
+
+            // },
+            // 自己写的样式使用模块化
+            // {
+            //     test: /\.(css|less)$/,
+
+            //     use: [
+            //         // 插入内联样式
+            //         "style-loader", {
+            //             // 解析css
+            //             loader: "css-loader",
+            //             options: {
+            //                 modules: true,
+            //                 // 定义类名，默认是［hash:base64］
+            //                 // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+            //                 localIdentName: '[name]-[local]_[hash:base64:4]'
+            //             }
+            //         }, {
+            //             // 兼容css，相关配置在 postcss.config.js 里面
+            //             loader: "postcss-loader"
+            //         },{
+            //             loader:"less-loader"
+            //         }
+            //     ],
+            //     include:[
+            //         path.resolve(__dirname,"src/component-container"),
+            //         path.resolve(__dirname,"src/component-show"),
+            //     ],
+            //     exclude:[]
+            // },
             {
-                test: /\.css$/,
-                use: extractTextPlugin.extract({
+                test: /iconfont.css$/,
+                use: extract_iconfont.extract({
                     fallback: "style-loader",
                     use: [
                         {
@@ -30,35 +97,87 @@ module.exports = merge(common, {
                         }, {
                             // 兼容css，相关配置在 postcss.config.js 里面
                             loader: "postcss-loader"
+                        }, {
+                            loader: "less-loader"
                         }
                     ]
                 }),
-                exclude: [
-                    path.resolve(__dirname,"./src/css")
+                include: [
+                    path.resolve(__dirname, "./src/static/fonts")
                 ]
             },
-            // 这个专门用来做路由切换动画，因为目前只知道把样式嵌套在style里面才有效果。
             {
                 test: /\.css$/,
-                use: [
-                    // 插入内联样式
-                    "style-loader", {
-                        // 解析css
-                        loader: "css-loader",
-                        options: {
-                            modules: false,
-                            // 定义类名，默认是［hash:base64］
-                            // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+                use: extract_index.extract({
+                    fallback: "style-loader",
+                    use: [
+                        {
+                            // 解析css
+                            loader: "css-loader",
+                            options: {
+                                modules: false,
+                                // 定义类名，默认是［hash:base64］
+                                // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+                            }
+                        }, {
+                            // 兼容css，相关配置在 postcss.config.js 里面
+                            loader: "postcss-loader"
+                        }, {
+                            loader: "less-loader"
                         }
-                    }, {
-                        // 兼容css，相关配置在 postcss.config.js 里面
-                        loader: "postcss-loader"
-                    }
-                ],
-                include:[
-                    path.resolve(__dirname,"./src/css")
+                    ]
+                }),
+                include: [
+                    path.resolve(__dirname, "./src/static/stylesheet")
                 ]
-            }
+            },
+            {
+                test: /\.css$/,
+                use: extract_module.extract({
+                    fallback: "style-loader",
+                    use: [
+                        {
+                            // 解析css
+                            loader: "css-loader",
+                            options: {
+                                modules: true,
+                                // 定义类名，默认是［hash:base64］
+                                localIdentName: '[path][name]-[local]_[hash:base64:4]'
+                            }
+                        }, {
+                            // 兼容css，相关配置在 postcss.config.js 里面
+                            loader: "postcss-loader"
+                        }, {
+                            loader: "less-loader"
+                        }
+                    ]
+                }),
+                include: [
+                    path.resolve(__dirname, "./src/components")
+                ]
+            },
+            // // 这个专门用来做路由切换动画，因为目前只知道把样式嵌套在style里面才有效果。
+            // {
+            //     test: /\.css$/,
+            //     use: [
+            //         // 插入内联样式
+            //         "style-loader", {
+            //             // 解析css
+            //             loader: "css-loader",
+            //             options: {
+            //                 modules: false,
+            //                 // 定义类名，默认是［hash:base64］
+            //                 // localIdentName: '[path][name]-[local]_[hash:base64:4]'
+            //             }
+            //         }, {
+            //             // 兼容css，相关配置在 postcss.config.js 里面
+            //             loader: "postcss-loader"
+            //         }
+            //     ],
+            //     include:[
+            //         path.resolve(__dirname,"./src/css")
+            //     ]
+            // }
         ]
     },
     plugins: [
@@ -72,9 +191,9 @@ module.exports = merge(common, {
             }
         ),
         // 提取css到单独文件
-        new extractTextPlugin({
-            filename: "css/[name].css"
-        }),
+        extract_iconfont,
+        extract_index,
+        extract_module,
         // 代码压缩
         new UglifyJsPlugin(),
         // 定义开发环境，这里定义了开发环境
@@ -83,7 +202,7 @@ module.exports = merge(common, {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: "common",
-            filename: "javascript/[name].js",
+            filename: "static/javascript/chunk/[name].js",
             minChunks: 2
         })
     ]
