@@ -18,15 +18,20 @@ class Discover extends Component {
         ];
         return (
             <div className="tabHeight">
-                <div className="habitTop">
-                    <div className="habitTop_right iconfont icon-search"></div>
-                </div>
                 <Tabs tabs={tabs}>
                     <div style={{margin:"10px"}}>
                         <Detail/>
+                        <Detail/>
+                        <Detail/>
+                        <Detail/>
+                        <Detail/>
                     </div>
-                    <div>关注</div>
-                    <div>最新</div>
+                    <div style={{margin:"10px"}}>
+                        <Detail/>
+                    </div>
+                    <div style={{margin:"10px"}}>
+                        <Detail/>   
+                    </div>
                 </Tabs>
             </div>
         )

@@ -26,6 +26,7 @@
     "react-router-redux": "^5.0.0-alpha.6",
     "react-sticky": "^6.0.2",
     "react-transition-group": "^2.3.0",
+    "react-wx-images-viewer": "^1.0.6",
     "redux": "^3.7.2",
     "redux-saga": "^0.16.0"
   },

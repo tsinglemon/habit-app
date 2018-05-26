@@ -1,6 +1,9 @@
 
 import React, { Component } from "react";
 import { List } from 'antd-mobile';
+import { Link, Route, BrowserRouter, Switch, withRouter } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
+import { NavBar, Icon } from 'antd-mobile';
 
 class Habit extends Component {
     constructor(props) {
@@ -9,16 +12,21 @@ class Habit extends Component {
         this.state = {
 
         }
+        this.forward = this.forward.bind(this);
+    }
+    forward(e){
+        this.props.history.push(e);
     }
 
     render() {
         return (
             <div>
-                <div className="habitTop">
-                    <div className="habitTop_left">编辑</div>
-                    <div className="habitTop_center">习惯</div>
-                    <div className="habitTop_right iconfont icon-add"></div>
-                </div>
+                <NavBar
+                    mode="light"
+                    rightContent={<div className="iconfont icon-add"
+                    onClick={(e)=>{ this.forward("/habit/add") }}
+                    ></div>}
+                > 我的习惯</NavBar>
                 <List className="per-habit-list">
                     <List.Item
                         className="per-habit-item"
@@ -27,13 +35,15 @@ class Habit extends Component {
                         multipleLine
                         onClick={() => { }}
                     >
-                        { <div className="per-habit-name">画画</div> }
-                        <List.Item.Brief className="per-habit-brief">subtitle</List.Item.Brief>
+                        <Link to="/habit/book/0001">
+                            {<div className="per-habit-name">画画</div>}
+                            <List.Item.Brief className="per-habit-brief">subtitle</List.Item.Brief>
+                        </Link>
                     </List.Item>
                 </List>
             </div>
         )
     }
 }
-
-export { Habit }
+const habit = withRouter( Habit )
+export default habit;

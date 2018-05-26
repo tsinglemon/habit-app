@@ -12,7 +12,8 @@ import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
 import axios from 'axios'
 
-import routers from './routers/index.js';
+// {renderRoutes(routers)}
+import router from './routers/index.js';
 
 
 
@@ -20,7 +21,7 @@ ReactDom.render(
     <div>
         <BrowserRouter>
             <div>
-                {renderRoutes(routers)}
+                {renderRoutes(router)}
             </div>
         </BrowserRouter>
     </div>,

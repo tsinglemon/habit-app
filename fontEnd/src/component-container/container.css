@@ -1,0 +1,16 @@
+/* 关注按钮 */
+.btn {
+    display: inline-block;
+    padding:4px 0px;
+    min-width:60px;
+    font-size:14px;
+    text-align: center;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #fff;
+}
+.btn.active {
+    color:#fff;
+}

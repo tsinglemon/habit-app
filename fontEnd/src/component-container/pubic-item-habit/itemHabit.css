@@ -1,0 +1,31 @@
+.wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top:54px;
+    background: #fff;
+}
+
+.book_wrap {
+    margin:10px;
+}
+.header {
+    padding:8px 10px;
+    color:#333;
+}
+.add {
+    display: inline-block;
+    padding:0 20px;
+    height: 30px;
+    font-size:14px;
+    line-height: 30px;
+    text-align: center;
+    color:#fafafa;
+    background: #39cc7b;
+    border:none;
+    border-radius: 0;
+}
+.add.active {
+    background: #8becb7;
+}

@@ -56,6 +56,9 @@ module.exports = merge(common,{
                 include:[
                     path.resolve(__dirname,"node_modules/normalize.css"),
                     path.resolve(__dirname,"node_modules/antd-mobile"),
+                    path.resolve(__dirname,"node_modules/react-wx-images-viewer"),
+                    
+
                     path.resolve(__dirname,"src/static/fonts"),
                     path.resolve(__dirname,"src/static/stylesheet")
                 ],

@@ -1,0 +1,86 @@
+
+.wrap {
+    padding-top:34px;
+}
+.message {
+    margin-top:10px;
+    background: #fff;
+}
+.message .title {
+    padding:6px 0 6px 8px;
+    font-size:16px;
+    color:#666;
+    border-left:4px solid #39cc7b;
+}
+.message .content {
+    background: #fff;
+}
+.msg_user .msg_type{
+    margin-left:8px;
+    color:#999;
+}
+.msg_userPic {
+    width:40px;
+    height: 40px;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 50%;
+}
+.msg_userPic img {
+    display: inline-block;
+    vertical-align: middle;
+    width:initial;
+    height:initial;
+    max-width:100%;
+}
+.msg_userPic::before {
+    content:"";
+    display:inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.msg_right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.msg_item {
+    flex:1;
+    margin-right:10px;
+}
+
+.msg_record {
+    width:80px;
+    height: 40px;
+    text-align: center;
+}
+.msg_record::before {
+    content:"";
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+.msg_user {
+    font-size:14px;
+    color:#333;
+}
+.msg_time {
+    margin:0;
+    font-size:12px;
+}
+.btn {
+    display: inline-block;
+    padding:4px 0px;
+    min-width:60px;
+    font-size:14px;
+    line-height: 1;
+    color:#999;
+    vertical-align: middle;
+    border:1px solid #999;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.btn.active {
+    color:#39cc7b;
+    border:1px solid #39cc7b
+}

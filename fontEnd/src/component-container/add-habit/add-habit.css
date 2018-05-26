@@ -1,0 +1,30 @@
+
+.wrap {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: space-between; */
+    align-items: center;
+    background: #39cc7b;
+}
+.wrap .bar {
+    width:100%;
+    background-color: #39cc7b;
+}
+.wrap .back {
+    width:40px;
+}
+.addBtn {
+    background: #39cc7b;
+    border:none;
+}
+
+.addBtn.active {
+    background: #82efb2;
+}
+.habitName {
+    font-size:14px;
+    color:#666;
+}
+.joinCount {
+
+}

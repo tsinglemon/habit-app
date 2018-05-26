@@ -2,59 +2,62 @@
 
 
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
-import {asyncComponent} from "../static/javascript/asyncComponent.js"
+import { asyncComponent } from "../static/javascript/asyncComponent.js"
 
 import Wrap from '../component-container/wrap.jsx';
+import Habit from '../component-container/habit.jsx';
+import { Book } from '../component-container/book/index.jsx';
+import  {Discover}  from '../component-container/discover.jsx';
+import  {ItemRecords}  from '../component-container/pubic-item-habit/index.jsx';
+import  {AddHabit}  from '../component-container/add-habit/index.jsx';
+import  {Interest}  from '../component-container/interest/index.jsx';
+import  {Entry}  from '../component-container/entry/index.jsx';
 
 
 
 // const Moren = asyncComponent("Zujian2",() => import(/*webpackChunkName:"zujian2"*/"./zujian3.jsx"));
-
+// https://www.jianshu.com/p/e3adc9b5f75c
 
 export default [
     {
-        path:'/',
+        path: '/',
         exact:true,
-        component:Wrap
+        component: Wrap
     },
     {
-        path:'/habit',
-        exact:true,
-        component:Wrap
+        path: '/entry',
+        component: Entry
     },
     {
-        path:'/discover',
-        exact:true,
-        component:Wrap
+        path: '/record/:id',
+        component: ItemRecords
     },
     {
-        path:'/message',
-        exact:true,
-        component:Wrap
+        path: '/habit/book/:id',
+        component: Book,
     },
     {
-        path:'/my',
-        exact:true,
-        component:Wrap
+        path: '/habit/add',
+        component: AddHabit
     },
-    // {
-    //     path:'/2',
-    //     component:Zujian2,
-    //     routes:[
-    //         {
-    //             path:'/2/a',
-    //             component:Demo,
-    //             routes:[
-    //                 {
-    //                     path:'/2/a/9',
-    //                     component:Zujian1
-    //                 }
-    //             ]
-    //         }
-    //     ]
-    // },
-    // {
-    //     path:'/3',
-    //     component:Zujian3
-    // }
+    {
+        path: '/habit',
+        component: Wrap
+    },
+    {
+        path: '/discover',
+        component: Wrap
+    },
+    {
+        path: '/favorite',
+        component: Wrap
+    },
+    {
+        path:'/my/inserest/:id',
+        component: Interest
+    },
+    {
+        path: '/my',
+        component: Wrap
+    }
 ]
