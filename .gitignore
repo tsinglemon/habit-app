@@ -2,3 +2,5 @@
 /fontEnd/node_modules
 /server/data/db
 /server/data/log
+/fontEnd/build
+/server/static

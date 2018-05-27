@@ -14,9 +14,35 @@ const user_info = require('../models/user_info.js')
 // 用于加密签名的变量
 app.set('superSecret', "superSecret");
 
+router.post('/checkUserName', (req, res) => {
+    let name = req.body.name;
+    if(!name){
+        res.json({
+            msg:"用户名不能为空",
+            code:1
+        })
+    }
+
+    user_security.findOne({ name }, (err, msg) => {
+        if (msg) {
+            res.json({
+                name,
+                msg: "该用户已注册",
+                code: 1
+            });
+        } else {
+            res.json({
+                name,
+                msg: "该用户可以注册",
+                code: 0
+            });
+        }
+    })
+})
 router.post('/register', (req, res) => {
     let name = req.body.name;
     let password = req.body.password;
+    let rePassword = req.body.rePassword;
     let token = "";
 
     user_security.findOne({ name }, (err, msg) => {
@@ -27,6 +53,7 @@ router.post('/register', (req, res) => {
                 code: 1
             });
         } else {
+            if(password!==rePassword) return;
             // 新建用户
             token = jwt.sign({ msg }, app.get('superSecret'), {
                 expiresIn: 60 * 60 * 24

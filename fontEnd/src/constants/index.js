@@ -4,11 +4,17 @@
 
 // 关于异步请求
 const req = {
+    // 检查注册的用户名
     REQ_CHECK_USER_NAME:"REQ_CHECK_USER_NAME",
+    // 请求注册
     REQ_REGISTER:"REQ_REGISTER",
 }
-// 关于请求的结果，用于saga通知stroe更新
+
+// 获取或者更新store
 const res = {
+    // 用户名是否唯一
+    RES_CHECK_USER_NAME:"RES_CHECK_USER_NAME",
+    // 注册信息
     RES_REGISTER:"RES_REGISTER"
 }
 

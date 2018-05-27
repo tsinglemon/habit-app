@@ -6,23 +6,23 @@
 
 import React, { Component } from "react";
 import { Link, withRouter } from 'react-router-dom';
-import { NavBar, Icon, Button, InputItem } from 'antd-mobile';
+import { NavBar, Icon, Button, InputItem, Toast } from 'antd-mobile';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 
 import style from './entry.css';
-// import {req,res} from '../../constants/index.js';
+import { res } from '../../constants/index.js';
 import allAction from '../../action/index.js';
+
 class entry extends Component {
+
     constructor(props) {
         super(props)
         this.state = {
             isJump: false,
-            userName: "",
             password: "",
             rePassword: "",
             isRegister: true,
-            isUserNameTip: false,
             isPasswordTip: false
         }
         this.goBack = this.goBack.bind(this);
@@ -30,7 +30,18 @@ class entry extends Component {
     goBack() {
         this.props.history.goBack();
     }
+    componentDidMount() {
+        // console.log(this.props)
+        // this.setState({
+        //     isJump:
+        // })
+    }
+    componentWillUpdate() {
+        // console.log(this.props)
+    }
+
     render() {
+        let userName = ""
         return (
             <div className="entry">
                 <NavBar
@@ -49,21 +60,12 @@ class entry extends Component {
                         type="text"
                         placeholder="用户名"
                         onBlur={(e) => {
-                            // 异步请求
-                            // 判断用户名有没有重复
-                            this.props.allAction.req_checkUserName({helo:"我来自登录注册页面"})
-                            // this.setState({
-                            //     userName: e
-                            // })
-                            // 如果重复了就显示提示
-                            // this.setState({
-                            //     isUserNameTip: true
-                            // })
+                            this.props.allAction.req_checkUserName({ userName: e })
                         }}
                     >用户名</InputItem>
-                    {this.state.isUserNameTip ? (
-                        <p className={`${style.tip}`}>用户名已注册</p>
-                    ) : ""}
+                    <p className={`${style.tip}`}>
+                        {this.props.userinfo.data ? this.props.userinfo.data.code === 1 ? this.props.userinfo.data.msg : "" : ""}
+                    </p>
 
                     <InputItem
                         type="password"
@@ -81,17 +83,20 @@ class entry extends Component {
                                     type="password"
                                     placeholder="密码"
                                     onBlur={(e) => {
-                                        this.setState({
-                                            rePassword: e
-                                        })
-                                        // 如果重复了就显示提示
-                                        // this.setState({
-                                        //     isPasswordTip: true
-                                        // })
+                                        if (this.state.password.replace(/ /g, "") !== e || this.state.password.replace(/ /g, "") === "") {
+                                            this.setState({
+                                                isPasswordTip: true
+                                            })
+                                        } else {
+                                            this.setState({
+                                                isPasswordTip: false,
+                                                rePassword: e
+                                            })
+                                        }
                                     }}
                                 >确认密码</InputItem>
                                 {this.state.isPasswordTip ? (
-                                    <p className={`${style.tip}`}>密码不一致</p>
+                                    <p className={`${style.tip}`}>两次密码要一致并且不能为空</p>
                                 ) : ""}
                             </div>
                         ) : ""
@@ -105,9 +110,9 @@ class entry extends Component {
                                     isRegister: !this.state.isRegister
                                 })
                             }}
-                        >{
-                                this.state.isRegister ? "登录" : "注册"
-                            }</span>
+                        >
+                            {this.state.isRegister ? "登录" : "注册"}
+                        </span>
                     </div>
                     <div className={`${style.btn}`}>
                         <Button
@@ -115,14 +120,18 @@ class entry extends Component {
                             activeClassName={`${style.active}`}
                             className={`${style.button}`}
                             onClick={(e) => {
-
-                                // 提交注册登录信息，需要跳到saga
-                                if (this.state.isRegister) {
-                                    let { userName, password, rePassword } = this.state;
-                                    console.log(userName)
-                                } else {
-                                    let { userName, password } = this.state;
+                                if (!this.props.userinfo.data) {
+                                    Toast.info('请完整输入', 1.5, null, false);
+                                    return;
                                 }
+                                let name = this.props.userinfo.data.name,
+                                    password = this.state.password,
+                                    rePassword = this.state.rePassword;
+                                this.props.allAction.req_register({
+                                    name,
+                                    password,
+                                    rePassword
+                                })
                             }}
                         >
                             {this.state.isRegister ? "注册" : "登录"}
@@ -135,13 +144,13 @@ class entry extends Component {
     }
 }
 const mapStateToProps = (state) => {
-    // const { hala,user } = state.userinfo;
-    console.log(state)
-    return { state };
+    let userinfo = state.userinfo
+    console.log(userinfo)
+    return { userinfo };
 }
 const mapDispatchToProps = (dispath) => {
     return {
-        allAction:bindActionCreators(allAction,dispath)
+        allAction: bindActionCreators(allAction, dispath)
     }
 }
 const entry_withRouter = withRouter(entry)
@@ -150,3 +159,9 @@ const Entry = connect(
     mapDispatchToProps
 )(entry_withRouter)
 export { Entry }
+
+
+/**
+ * 明天
+ * 注册成功后自动登录，然后跳转到发现页。
+ */

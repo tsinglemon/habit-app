@@ -52,6 +52,10 @@ router.prepareSocketIO = function (server) {
     //         return next()
     //     }
     // })
+    /**
+     * 一条图文记录的评论属于一个房间，房间号是图文的id，对应的socket键就是用户的id
+     * 由于每次上线socketId都不一样，所以当用户离线后就从房间离开，并且把对应的socketId清空；
+     */
     let rooms = []
     let users = {}
     io.sockets.on('connection', (socket) => {
@@ -87,39 +91,6 @@ router.prepareSocketIO = function (server) {
             // io.in(msg).emit('j',"我在这个房间说话："+msg)
             
         })
-
-        // console.log(socket.request.headers.referer)
-
-        // console.log(socket.id)
-        // io.clients((error, clients) => {
-        //     if (error) throw error;
-        //     console.log(clients);
-        // });
-        // io.of('/user').clients((error, clients) => {
-        //     if (error) throw error;
-        //     console.log(clients);
-        // });
-        // console.log(socket.nsp.name)
-        // io.of('/user').clients((error, clients) => {
-        //     if (error) throw error;
-        //     console.log(clients); // => [Anw2LatarvGVVXEIAAAD]
-        // });
-        // io.of('/').send({a:999})
-        // socket.join('user', () => {
-        //     let rooms = Object.keys(socket.rooms);
-        //     console.log(rooms); // [ <socket.id>, 'room 237' ]
-        // });
-        // socket.leave('room 237', () => {
-        //     let rooms = Object.keys(socket.rooms);
-        //     console.log(rooms); // [ <socket.id>, 'room 237' ]
-        // });
-        // setTimeout(() => {
-            // io.of('/user').clients((error, clients) => {
-            //     if (error) throw error;
-            //     console.log(clients);
-            // });
-        //     socket.to('user').emit('message',"只有在user房间里的用户才收到")
-        // }, 2000)
     });
 };
 
