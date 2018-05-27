@@ -10,20 +10,19 @@ import ReactDom from "react-dom";
 import { Provider } from 'react-redux';
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
-import axios from 'axios'
 
-// {renderRoutes(routers)}
 import router from './routers/index.js';
+import configureStore from './store/configureStore.js'
 
-
+const store = configureStore();
 
 ReactDom.render(
-    <div>
+    <Provider store={store}>
         <BrowserRouter>
             <div>
                 {renderRoutes(router)}
             </div>
         </BrowserRouter>
-    </div>,
+    </Provider>,
     document.getElementById('root')
 );

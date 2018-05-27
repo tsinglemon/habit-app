@@ -19,7 +19,7 @@ class wrap extends Component {
         let tab = props.location.pathname.replace("/", "")
         this.state = {
             selectedTab: tab,
-            isLogin:true
+            isLogin:false
         }
     }
 

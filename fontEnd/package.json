@@ -15,6 +15,7 @@
     "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "classnames": "^2.2.5",
+    "postcss-import": "^11.1.0",
     "promise-polyfill": "^7.1.2",
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.2",

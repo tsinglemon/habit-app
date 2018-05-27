@@ -7,11 +7,12 @@
 import React, { Component } from "react";
 import { Link, withRouter } from 'react-router-dom';
 import { NavBar, Icon, Button, InputItem } from 'antd-mobile';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+
 import style from './entry.css';
-
-import constants from '../../constants/index.js';
-
-
+// import {req,res} from '../../constants/index.js';
+import allAction from '../../action/index.js';
 class entry extends Component {
     constructor(props) {
         super(props)
@@ -50,10 +51,10 @@ class entry extends Component {
                         onBlur={(e) => {
                             // 异步请求
                             // 判断用户名有没有重复
-
-                            this.setState({
-                                userName: e
-                            })
+                            this.props.allAction.req_checkUserName({helo:"我来自登录注册页面"})
+                            // this.setState({
+                            //     userName: e
+                            // })
                             // 如果重复了就显示提示
                             // this.setState({
                             //     isUserNameTip: true
@@ -133,6 +134,19 @@ class entry extends Component {
         )
     }
 }
-
-const Entry = withRouter(entry)
+const mapStateToProps = (state) => {
+    // const { hala,user } = state.userinfo;
+    console.log(state)
+    return { state };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction:bindActionCreators(allAction,dispath)
+    }
+}
+const entry_withRouter = withRouter(entry)
+const Entry = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(entry_withRouter)
 export { Entry }

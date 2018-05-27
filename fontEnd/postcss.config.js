@@ -12,11 +12,14 @@ const PostcssVmin = require('postcss-vmin')
 const Pixrem = require('pixrem')
 const PostcssWillChange = require('postcss-will-change')
 const PostcssColorAlpha= require('postcss-color-alpha')
+const PostcssImport= require('postcss-import')
+
 
 
 
 module.exports = {
     plugins: [
+        PostcssImport(),
         // 添加浏览器前缀
         Autoprefixer({
             // 指定加前缀的浏览器  配置项：https://github.com/browserslist/browserslist

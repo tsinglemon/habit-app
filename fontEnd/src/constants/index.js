@@ -2,13 +2,17 @@
  * redux用到的所有常量
  */
 
-// export const UPDATE_CITYNAME = 'UPDATE_CITYNAME';
-
-export default {
-    a:111,
-    b:2222,
-    c:443333
+// 关于异步请求
+const req = {
+    REQ_CHECK_USER_NAME:"REQ_CHECK_USER_NAME",
+    REQ_REGISTER:"REQ_REGISTER",
 }
+// 关于请求的结果，用于saga通知stroe更新
+const res = {
+    RES_REGISTER:"RES_REGISTER"
+}
+
+export {req,res}
 
 
 /**

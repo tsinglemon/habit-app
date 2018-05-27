@@ -14,7 +14,6 @@ class AddHabit extends Component {
         this.state = {
 
         }
-        console.log(this.props)
         this.forward = this.forward.bind(this);
         this.goBack = this.goBack.bind(this);
         this.onChange = this.onChange.bind(this);
