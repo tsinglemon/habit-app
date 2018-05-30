@@ -8,6 +8,10 @@ const req = {
     REQ_CHECK_USER_NAME:"REQ_CHECK_USER_NAME",
     // 请求注册
     REQ_REGISTER:"REQ_REGISTER",
+    // 登录
+    REQ_LOGIN:"REQ_LOGIN",
+    // 是否登录
+    REQ_ISLOGIN:"REQ_ISLOGIN"
 }
 
 // 获取或者更新store
@@ -15,7 +19,11 @@ const res = {
     // 用户名是否唯一
     RES_CHECK_USER_NAME:"RES_CHECK_USER_NAME",
     // 注册信息
-    RES_REGISTER:"RES_REGISTER"
+    RES_REGISTER:"RES_REGISTER",
+    // 登录信息
+    RES_LOGIN:"RES_LOGIN",
+    // 判断是否登录
+    RES_ISLOGIN:"RES_ISLOGIN"
 }
 
 export {req,res}

@@ -5,25 +5,27 @@
  */
 
 import React, { Component } from "react";
-import { Link, withRouter } from 'react-router-dom';
 import { NavBar, Icon, Button, InputItem, Toast } from 'antd-mobile';
+import { Link, withRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 
-import style from './entry.css';
 import { res } from '../../constants/index.js';
 import allAction from '../../action/index.js';
 
+import style from './entry.css';
 class entry extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            isJump: false,
+            isLogin: false,
+            userName: "",
             password: "",
             rePassword: "",
             isRegister: true,
-            isPasswordTip: false
+            isPasswordSame: true,
+            canRegister: false
         }
         this.goBack = this.goBack.bind(this);
     }
@@ -31,23 +33,24 @@ class entry extends Component {
         this.props.history.goBack();
     }
     componentDidMount() {
-        // console.log(this.props)
-        // this.setState({
-        //     isJump:
-        // })
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
     }
-    componentWillUpdate() {
-        // console.log(this.props)
+    componentDidUpdate() {
+        if (this.props.userinfo.data) {
+            if ( this.props.userinfo.data.code !== 1&& this.props.userinfo.data.code !== 0||
+                this.props.userinfo.data.code===4) {
+                console.log("登录，注册，修改密码成功了")
+                this.props.history.replace('/my')
+            }
+        }
     }
 
     render() {
-        let userName = ""
         return (
             <div className="entry">
                 <NavBar
                     mode="light"
-                    leftContent={this.state.isJump ? (<Icon type="left" />) : (<span />)}
-                    onLeftClick={(e) => { this.goBack() }}
                 >注册/登录</NavBar>
 
                 <div className={`${style.wrap}`}>
@@ -59,21 +62,46 @@ class entry extends Component {
                     <InputItem
                         type="text"
                         placeholder="用户名"
-                        onBlur={(e) => {
-                            this.props.allAction.req_checkUserName({ userName: e })
+                        onChange={(e) => {
+                            if (this.state.isRegister) {
+                                this.props.allAction.req_checkUserName({ userName: e })
+                            } else {
+                                this.setState({
+                                    userName: e
+                                })
+                            }
+
                         }}
                     >用户名</InputItem>
                     <p className={`${style.tip}`}>
-                        {this.props.userinfo.data ? this.props.userinfo.data.code === 1 ? this.props.userinfo.data.msg : "" : ""}
+                        {
+                            this.state.isRegister && this.props.userinfo.data ?
+                                this.props.userinfo.data.code === 0 ? this.props.userinfo.data.msg : "" : ""}
                     </p>
 
                     <InputItem
                         type="password"
                         placeholder="密码"
                         onChange={(e) => {
-                            this.setState({
-                                password: e
-                            })
+                            if (this.state.isRegister) {
+                                if (e.replace(/ /g, "") === "" || e !== this.state.rePassword) {
+                                    this.setState({
+                                        password: e.replace(/ /g, ""),
+                                        isPasswordSame: false
+                                    })
+                                } else {
+                                    this.setState({
+                                        password: e.replace(/ /g, ""),
+                                        isPasswordSame: true
+                                    })
+                                }
+                            } else {
+                                this.setState({
+                                    password: e,
+                                    isPasswordSame: true
+                                })
+                            }
+
                         }}
                     >密码</InputItem>
                     {
@@ -82,33 +110,46 @@ class entry extends Component {
                                 <InputItem
                                     type="password"
                                     placeholder="密码"
-                                    onBlur={(e) => {
-                                        if (this.state.password.replace(/ /g, "") !== e || this.state.password.replace(/ /g, "") === "") {
+                                    onChange={(e) => {
+                                        if (e.replace(/ /g, "") === "" || e !== this.state.password) {
                                             this.setState({
-                                                isPasswordTip: true
+                                                rePassword: e.replace(/ /g, ""),
+                                                isPasswordSame: false
                                             })
                                         } else {
                                             this.setState({
-                                                isPasswordTip: false,
-                                                rePassword: e
+                                                rePassword: e.replace(/ /g, ""),
+                                                isPasswordSame: true
                                             })
                                         }
                                     }}
                                 >确认密码</InputItem>
-                                {this.state.isPasswordTip ? (
-                                    <p className={`${style.tip}`}>两次密码要一致并且不能为空</p>
-                                ) : ""}
+
                             </div>
                         ) : ""
                     }
-
+                    {this.state.isPasswordSame ? "" :
+                        (<p className={`${style.tip}`}>
+                            {this.state.isRegister ? "两次密码要一致并且不能有空格" : "密码不能有空格"}
+                        </p>)
+                    }
 
                     <div className={`${style.tab}`} >
                         <span
                             onClick={(e) => {
                                 this.setState({
                                     isRegister: !this.state.isRegister
+                                }, () => {
+                                    if (this.state.isRegister) {
+                                        this.props.allAction.req_checkUserName({ userName: this.state.userName })
+
+                                        this.setState({
+                                            password: e,
+                                            isPasswordSame: true
+                                        })
+                                    }
                                 })
+
                             }}
                         >
                             {this.state.isRegister ? "登录" : "注册"}
@@ -120,18 +161,42 @@ class entry extends Component {
                             activeClassName={`${style.active}`}
                             className={`${style.button}`}
                             onClick={(e) => {
-                                if (!this.props.userinfo.data) {
-                                    Toast.info('请完整输入', 1.5, null, false);
+                                if (this.state.isRegister && !this.props.userinfo.data) {
+                                    Toast.info('用户名不能有空格', 2, null, false);
                                     return;
                                 }
-                                let name = this.props.userinfo.data.name,
+                                let name = "",
                                     password = this.state.password,
                                     rePassword = this.state.rePassword;
-                                this.props.allAction.req_register({
-                                    name,
-                                    password,
-                                    rePassword
-                                })
+
+                                // 密码不能为空
+                                if (password === "" || this.state.isRegister && rePassword === "") {
+                                    this.setState({
+                                        isPasswordSame: false
+                                    })
+                                    return;
+                                }
+                                // 两次密码要相等
+                                if (this.state.isRegister && !this.state.isPasswordSame) {
+                                    return;
+                                }
+
+                                if (this.state.isRegister) {
+                                    name = this.props.userinfo.data.name ? this.props.userinfo.data.name :
+                                        this.state.userName,
+                                        this.props.allAction.req_register({
+                                            name,
+                                            password,
+                                            rePassword
+                                        })
+                                } else {
+                                    name = this.state.userName ? this.state.userName : this.props.userinfo.data.name
+
+                                    this.props.allAction.req_login({
+                                        name,
+                                        password
+                                    })
+                                }
                             }}
                         >
                             {this.state.isRegister ? "注册" : "登录"}

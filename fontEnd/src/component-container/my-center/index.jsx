@@ -10,6 +10,9 @@ class mycenter extends Component {
 
         };
     }
+    componentDidMount(){
+       
+    }
 
 
     render() {

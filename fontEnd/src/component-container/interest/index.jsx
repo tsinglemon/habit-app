@@ -2,6 +2,12 @@
 import React, { Component } from "react";
 import { Popover, NavBar, Icon, Button, List } from 'antd-mobile';
 import { Link, withRouter } from 'react-router-dom';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+import { res } from '../../constants/index.js';
+import allAction from '../../action/index.js';
+
 import style from './interest.css';
 
 class interest extends Component {
@@ -11,6 +17,20 @@ class interest extends Component {
 
         };
         this.goBack = this.goBack.bind(this);
+    }
+    componentDidMount(){
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
+    }
+    componentDidUpdate() {
+        console.log(this.props.userinfo.data)
+        if (this.props.userinfo.data) {
+            if (this.props.userinfo.data.code === 0) {
+                this.props.history.replace('/entry')
+            } else {
+                console.log("已登录")
+            }
+        }
     }
     goBack(val) {
         this.props.history.goBack()
@@ -61,5 +81,20 @@ class interest extends Component {
         )
     }
 }
-const Interest = withRouter(interest)
+
+const mapStateToProps = (state) => {
+    let userinfo = state.userinfo
+    // console.log(userinfo)
+    return { userinfo };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction: bindActionCreators(allAction, dispath)
+    }
+}
+const interest_withRouter = withRouter(interest)
+const Interest = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(interest_withRouter)
 export { Interest }

@@ -11,6 +11,9 @@ class Favorite extends Component {
 
         }
     }
+    componentDidMount(){
+       
+    }
 
     render() {
         return (

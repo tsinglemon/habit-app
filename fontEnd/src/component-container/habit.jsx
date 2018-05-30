@@ -14,6 +14,9 @@ class Habit extends Component {
         }
         this.forward = this.forward.bind(this);
     }
+    componentDidMount(){
+       
+    }
     forward(e){
         this.props.history.push(e);
     }

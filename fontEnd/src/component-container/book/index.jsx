@@ -1,6 +1,14 @@
 
 import React, { Component } from "react";
 import { Popover, NavBar, Icon, TextareaItem, ImagePicker, Button } from 'antd-mobile';
+import { Link, Route, BrowserRouter, Switch, Redirect, withRouter } from 'react-router-dom';
+
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+import { res } from '../../constants/index.js';
+import allAction from '../../action/index.js';
+
 import WxImageViewer from 'react-wx-images-viewer';
 import Detail from '../detail/index.jsx';
 import style from './book.css';
@@ -8,7 +16,7 @@ const Item = Popover.Item;
 
 const myImg = src => <img src={`https://gw.alipayobjects.com/zos/rmsportal/${src}.svg`} className="am-icon am-icon-xs" alt="" />;
 
-class Book extends Component {
+class book extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -26,7 +34,21 @@ class Book extends Component {
         this.goBack = this.goBack.bind(this);
         this.openViewer = this.openViewer.bind(this)
     }
+    componentDidMount(){
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
+    }
 
+    componentDidUpdate() {
+        console.log(this.props.userinfo.data)
+        if (this.props.userinfo.data) {
+            if (this.props.userinfo.data.code === 0) {
+                this.props.history.replace('/entry')
+            } else {
+                console.log("已登录")
+            }
+        }
+    }
     onChange = (files, type, index) => {
         console.log(files, type, index);
         this.setState({
@@ -188,5 +210,19 @@ class Book extends Component {
         )
     }
 }
-
+const mapStateToProps = (state) => {
+    let userinfo = state.userinfo
+    // console.log(userinfo)
+    return { userinfo };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction: bindActionCreators(allAction, dispath)
+    }
+}
+const book_withRouter = withRouter(book)
+const Book = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(book_withRouter)
 export { Book }

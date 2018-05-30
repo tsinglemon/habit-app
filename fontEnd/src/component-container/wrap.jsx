@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import { TabBar, Tabs, Badge } from 'antd-mobile';
-import { Link, Route, BrowserRouter, Switch,Redirect,  withRouter  } from 'react-router-dom';
+import { Link, Route, BrowserRouter, Redirect, withRouter } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+import { res } from '../constants/index.js';
+import allAction from '../action/index.js';
 
 import Habit from '../component-container/habit.jsx';
 import { Discover } from '../component-container/discover.jsx';
@@ -19,17 +24,36 @@ class wrap extends Component {
         let tab = props.location.pathname.replace("/", "")
         this.state = {
             selectedTab: tab,
-            isLogin:false
         }
+    }
+    componentDidMount() {
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
+    }
+    componentDidUpdate() {
+        console.log(this.props.userinfo.data)
+        if (this.props.userinfo.data) {
+            if (this.props.userinfo.data.code === 0) {
+                this.props.history.replace('/entry')
+            } else {
+                console.log("已登录")
+            }
+        }
+        // if(this.props.userinfo.data){
+        //     let isLogin = this.props.userinfo.data.isLogin;
+        //     if(!isLogin) {
+        //         this.props.history.replace('/entry')
+        //     }else{
+        //         this.props.history.replace('/')
+        //     }
+        // }
     }
 
     render() {
         return (
             <div style={{ position: 'fixed', height: '100%', width: '100%' }}>
                 <Route exact path="/" render={() => (
-                    this.state.isLogin?
-                    (<Redirect to="/habit" />):
-                    (<Redirect to="/entry" />)
+                    <Redirect to="/my" />
                 )} />
                 <TabBar
                     unselectedTintColor="#999"
@@ -38,7 +62,7 @@ class wrap extends Component {
                     hidden={false}
                 >
                     <TabBar.Item
-                    className="aa"
+                        className="aa"
                         title="习惯"
                         key="habit"
                         icon={<div style={{
@@ -135,14 +159,28 @@ class wrap extends Component {
                         selected={this.state.selectedTab === 'my'}
                         onPress={() => { this.props.history.replace('/my') }}
                     >
-                    <My/>
+                        <My />
                     </TabBar.Item>
                 </TabBar>
-               
+
             </div>
         );
     }
 
 }
-const Wrap = withRouter(wrap)
-export default Wrap
+const mapStateToProps = (state) => {
+    let userinfo = state.userinfo
+    // console.log(userinfo)
+    return { userinfo };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction: bindActionCreators(allAction, dispath)
+    }
+}
+const wrap_withRouter = withRouter(wrap)
+const Wrap = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(wrap_withRouter)
+export { Wrap }

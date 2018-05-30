@@ -4,7 +4,7 @@
 import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
 import { asyncComponent } from "../static/javascript/asyncComponent.js"
 
-import Wrap from '../component-container/wrap.jsx';
+import {Wrap} from '../component-container/wrap.jsx';
 import Habit from '../component-container/habit.jsx';
 import { Book } from '../component-container/book/index.jsx';
 import  {Discover}  from '../component-container/discover.jsx';

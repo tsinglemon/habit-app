@@ -5,9 +5,14 @@ import { List } from 'antd-mobile';
 import { Link, Route, BrowserRouter, withRouter } from 'react-router-dom';
 import { NavBar, Icon, SearchBar, Button } from 'antd-mobile';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+import { res } from '../../constants/index.js';
+import allAction from '../../action/index.js';
+
 import style from './add-habit.css';
 
-class AddHabit extends Component {
+class addHabit extends Component {
     constructor(props) {
         super(props);
 
@@ -18,8 +23,20 @@ class AddHabit extends Component {
         this.goBack = this.goBack.bind(this);
         this.onChange = this.onChange.bind(this);
     }
-    componentDidMount() {
+    componentDidMount(){
         this.autoFocusInst.focus();
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
+    }
+    componentDidUpdate() {
+        console.log(this.props.userinfo.data)
+        if (this.props.userinfo.data) {
+            if (this.props.userinfo.data.code === 0) {
+                this.props.history.replace('/entry')
+            } else {
+                console.log("已登录")
+            }
+        }
     }
     forward(e) {
         this.props.history.push(e);
@@ -95,5 +112,22 @@ class AddHabit extends Component {
         )
     }
 }
-// const habit = withRouter( AddHabit )
+
+
+const mapStateToProps = (state) => {
+    let userinfo = state.userinfo
+    // console.log(userinfo)
+    return { userinfo };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction: bindActionCreators(allAction, dispath)
+    }
+}
+const addHabit_withRouter = withRouter(addHabit)
+const AddHabit = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(addHabit_withRouter)
 export { AddHabit }
+

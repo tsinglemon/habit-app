@@ -1,12 +1,20 @@
 
 import React, { Component } from "react";
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, withRouter } from 'react-router-dom';
 import { NavBar, Icon, Button } from 'antd-mobile';
 import WxImageViewer from 'react-wx-images-viewer';
+
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
+import { res } from '../../constants/index.js';
+import allAction from '../../action/index.js';
+
+
 import Detail from '../detail/index.jsx';
 import style from './itemHabit.css';
 
-class ItemRecords extends Component {
+class itemRecords extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -16,6 +24,20 @@ class ItemRecords extends Component {
         this.goBack = this.goBack.bind(this);
         this.openViewer = this.openViewer.bind(this);
         this.replace = this.replace.bind(this);
+    }
+    componentDidMount(){
+        let token = window.localStorage.getItem("token")
+        this.props.allAction.req_isLogin({ token })
+    }
+    componentDidUpdate() {
+        console.log(this.props.userinfo.data)
+        if (this.props.userinfo.data) {
+            if (this.props.userinfo.data.code === 0) {
+                this.props.history.replace('/entry')
+            } else {
+                console.log("已登录")
+            }
+        }
     }
     onClose = () => {
         this.setState({
@@ -65,5 +87,19 @@ class ItemRecords extends Component {
         )
     }
 }
-
+const mapStateToProps = (state) => {
+    let userinfo = state.userinfo
+    // console.log(userinfo)
+    return { userinfo };
+}
+const mapDispatchToProps = (dispath) => {
+    return {
+        allAction: bindActionCreators(allAction, dispath)
+    }
+}
+const itemRecords_withRouter = withRouter(itemRecords)
+const ItemRecords = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(itemRecords_withRouter)
 export { ItemRecords }

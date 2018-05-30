@@ -24,6 +24,20 @@ function req_register(data) {
         data: data
     }
 }
+// 登录
+function req_login(data) {
+    return {
+        type: req.REQ_LOGIN,
+        data: data
+    }
+}
+// 是否登录
+function req_isLogin(data) {
+    return {
+        type: req.REQ_ISLOGIN,
+        data: data
+    }
+}
 
 
 
@@ -34,14 +48,28 @@ function req_register(data) {
 function update_isOnlyUserName(data) {
     return {
         type: res.RES_CHECK_USER_NAME,
-        data: data
+        data
     }
 }
 // 获取注册回执
 function update_register(data) {
     return {
         type: res.RES_REGISTER,
-        data: data
+        data
+    }
+}
+// 获取登录信息
+function update_login(data) {
+    return {
+        type: res.RES_LOGIN,
+        data
+    }
+}
+// 判断是否登录
+function update_isLogin(data) {
+    return {
+        type: res.RES_ISLOGIN,
+        data
     }
 }
 
@@ -49,6 +77,11 @@ function update_register(data) {
 export default {
     req_checkUserName,
     req_register,
+    req_login,
+    req_isLogin,
+
     update_isOnlyUserName,
-    update_register
+    update_register,
+    update_login,
+    update_isLogin
 }
