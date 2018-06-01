@@ -23,7 +23,7 @@ class entry extends Component {
             userName: "",
             password: "",
             rePassword: "",
-            isRegister: true,
+            isRegister: false,
             isPasswordSame: true,
             canRegister: false
         }
@@ -38,9 +38,8 @@ class entry extends Component {
     }
     componentDidUpdate() {
         if (this.props.userinfo.data) {
-            if ( this.props.userinfo.data.code !== 1&& this.props.userinfo.data.code !== 0||
-                this.props.userinfo.data.code===4) {
-                console.log("登录，注册，修改密码成功了")
+            if (this.props.userinfo.data.code !== 1 && this.props.userinfo.data.code !== 0 ||
+                this.props.userinfo.data.code === 4) {
                 this.props.history.replace('/my')
             }
         }
@@ -85,6 +84,7 @@ class entry extends Component {
                         onChange={(e) => {
                             if (this.state.isRegister) {
                                 if (e.replace(/ /g, "") === "" || e !== this.state.rePassword) {
+
                                     this.setState({
                                         password: e.replace(/ /g, ""),
                                         isPasswordSame: false
@@ -98,7 +98,7 @@ class entry extends Component {
                             } else {
                                 this.setState({
                                     password: e,
-                                    isPasswordSame: true
+                                    // isPasswordSame: true
                                 })
                             }
 
@@ -128,11 +128,13 @@ class entry extends Component {
                             </div>
                         ) : ""
                     }
-                    {this.state.isPasswordSame ? "" :
-                        (<p className={`${style.tip}`}>
-                            {this.state.isRegister ? "两次密码要一致并且不能有空格" : "密码不能有空格"}
-                        </p>)
-                    }
+                    <p className={`${style.tip}`}>{
+                        this.state.isRegister ?
+                            this.state.isPasswordSame ? '' : '两次密码要一致并且不能有空格'
+                            :
+                            this.props.userinfo.data ? this.props.userinfo.data.msg :
+                                ''
+                    }</p>
 
                     <div className={`${style.tab}`} >
                         <span
@@ -143,10 +145,7 @@ class entry extends Component {
                                     if (this.state.isRegister) {
                                         this.props.allAction.req_checkUserName({ userName: this.state.userName })
 
-                                        this.setState({
-                                            password: e,
-                                            isPasswordSame: true
-                                        })
+                                    //    console.log(this.state.password)
                                     }
                                 })
 
@@ -161,27 +160,27 @@ class entry extends Component {
                             activeClassName={`${style.active}`}
                             className={`${style.button}`}
                             onClick={(e) => {
-                                if (this.state.isRegister && !this.props.userinfo.data) {
-                                    Toast.info('用户名不能有空格', 2, null, false);
-                                    return;
-                                }
+                                // if (this.state.isRegister && !this.props.userinfo.data) {
+                                //     Toast.info('用户名不能有空格', 2, null, false);
+                                //     return;
+                                // }
                                 let name = "",
                                     password = this.state.password,
                                     rePassword = this.state.rePassword;
 
                                 // 密码不能为空
                                 if (password === "" || this.state.isRegister && rePassword === "") {
-                                    this.setState({
-                                        isPasswordSame: false
-                                    })
+                                    Toast.info('表单不能有留空', 2, null, false);
                                     return;
                                 }
                                 // 两次密码要相等
                                 if (this.state.isRegister && !this.state.isPasswordSame) {
+                                    Toast.info('两次密码输入不一致', 2, null, false);
                                     return;
                                 }
 
                                 if (this.state.isRegister) {
+                                    console.log(222)
                                     name = this.props.userinfo.data.name ? this.props.userinfo.data.name :
                                         this.state.userName,
                                         this.props.allAction.req_register({
@@ -210,7 +209,7 @@ class entry extends Component {
 }
 const mapStateToProps = (state) => {
     let userinfo = state.userinfo
-    console.log(userinfo)
+    console.log(userinfo.data)
     return { userinfo };
 }
 const mapDispatchToProps = (dispath) => {

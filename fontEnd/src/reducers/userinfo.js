@@ -29,7 +29,8 @@ export default (state, action) => {
         // 返回注册信息
         case res.RES_REGISTER:
             if (newData.data.token && newData.data.code === 2) {
-                window.localStorage.setItem("token", newData.data.token)
+            window.localStorage.setItem("token", newData.data.token)
+            window.localStorage.setItem("userId", newData.data.userId)
             }
             state[res.RES_REGISTER] = { ...state[res.RES_REGISTER], ...newData }
             return state[res.RES_REGISTER]
@@ -38,6 +39,7 @@ export default (state, action) => {
         case res.RES_LOGIN:
             if (newData.data.token && newData.data.code === 3) {
                 window.localStorage.setItem("token", newData.data.token)
+                window.localStorage.setItem("userId", newData.data.userId)
             }
             state[res.RES_LOGIN] = { ...state[res.RES_LOGIN], ...newData }
             return state[res.RES_LOGIN]
@@ -46,6 +48,16 @@ export default (state, action) => {
         case res.RES_ISLOGIN:
             state[res.RES_ISLOGIN] = { ...state[res.RES_ISLOGIN], ...newData }
             return state[res.RES_ISLOGIN]
+
+
+        // 返回搜索结果
+        case res.RES_SEARCH:
+            state[res.RES_SEARCH] = { ...state[res.RES_SEARCH], ...newData }
+            return state[res.RES_SEARCH]
+        // 返回创建结果
+        case res.RES_CREATEHABIT:
+            state[res.RES_CREATEHABIT] = { ...state[res.RES_CREATEHABIT], ...newData }
+            return state[res.RES_CREATEHABIT]
 
 
 

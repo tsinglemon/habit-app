@@ -40,7 +40,7 @@ class Habit extends Component {
                     >
                         <Link to="/habit/book/0001">
                             {<div className="per-habit-name">画画</div>}
-                            <List.Item.Brief className="per-habit-brief">subtitle</List.Item.Brief>
+                            <List.Item.Brief className="per-habit-brief">已坚持1天</List.Item.Brief>
                         </Link>
                     </List.Item>
                 </List>

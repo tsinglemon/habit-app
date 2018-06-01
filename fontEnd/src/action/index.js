@@ -38,6 +38,27 @@ function req_isLogin(data) {
         data: data
     }
 }
+// 搜索习惯
+function req_search(data) {
+    return {
+        type: req.REQ_SEARCH,
+        data: data
+    }
+}
+// 创建习惯
+function req_createHabit(data) {
+    return {
+        type: req.REQ_CREATEHABIT,
+        data: data
+    }
+}
+// 添加习惯
+function req_addHabit(data){
+    return {
+        type: req.REQ_ADDHABIT,
+        data: data
+    }
+}
 
 
 
@@ -72,16 +93,42 @@ function update_isLogin(data) {
         data
     }
 }
-
+// 搜索习惯
+function update_search(data){
+    return {
+        type: res.RES_SEARCH,
+        data
+    }
+}
+// 创建习惯
+function update_createHabit(data) {
+    return {
+        type: res.RES_CREATEHABIT,
+        data: data
+    }
+}
+// 添加习惯
+function update_addHabit(data) {
+    return {
+        type: res.RES_ADDHABIT,
+        data: data
+    }
+}
 
 export default {
     req_checkUserName,
     req_register,
     req_login,
     req_isLogin,
+    req_search,
+    req_createHabit,
+    req_addHabit,
 
     update_isOnlyUserName,
     update_register,
     update_login,
-    update_isLogin
+    update_isLogin,
+    update_search,
+    update_createHabit,
+    update_addHabit
 }

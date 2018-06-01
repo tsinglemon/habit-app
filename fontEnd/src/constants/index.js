@@ -11,7 +11,13 @@ const req = {
     // 登录
     REQ_LOGIN:"REQ_LOGIN",
     // 是否登录
-    REQ_ISLOGIN:"REQ_ISLOGIN"
+    REQ_ISLOGIN:"REQ_ISLOGIN",
+    // 搜索习惯
+    REQ_SEARCH:"REQ_SEARCH",
+    // 创建习惯
+    REQ_CREATEHABIT:"REQ_CREATEHABIT",
+    // 添加习惯
+    REQ_ADDHABIT:"REQ_ADDHABIT"
 }
 
 // 获取或者更新store
@@ -23,7 +29,13 @@ const res = {
     // 登录信息
     RES_LOGIN:"RES_LOGIN",
     // 判断是否登录
-    RES_ISLOGIN:"RES_ISLOGIN"
+    RES_ISLOGIN:"RES_ISLOGIN",
+    // 搜索习惯
+    RES_SEARCH:"RES_SEARCH",
+    // 创建习惯
+    RES_CREATEHABIT:"RES_CREATEHABIT",
+    // 添加习惯
+    RES_ADDHABIT:"RES_ADDHABIT"
 }
 
 export {req,res}
