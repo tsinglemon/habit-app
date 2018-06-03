@@ -2,43 +2,25 @@
  * redux用到的所有常量
  */
 
-// 关于异步请求
-const req = {
-    // 检查注册的用户名
-    REQ_CHECK_USER_NAME:"REQ_CHECK_USER_NAME",
-    // 请求注册
-    REQ_REGISTER:"REQ_REGISTER",
-    // 登录
-    REQ_LOGIN:"REQ_LOGIN",
-    // 是否登录
-    REQ_ISLOGIN:"REQ_ISLOGIN",
-    // 搜索习惯
-    REQ_SEARCH:"REQ_SEARCH",
-    // 创建习惯
-    REQ_CREATEHABIT:"REQ_CREATEHABIT",
-    // 添加习惯
-    REQ_ADDHABIT:"REQ_ADDHABIT"
-}
 
 // 获取或者更新store
-const res = {
-    // 用户名是否唯一
-    RES_CHECK_USER_NAME:"RES_CHECK_USER_NAME",
-    // 注册信息
-    RES_REGISTER:"RES_REGISTER",
-    // 登录信息
-    RES_LOGIN:"RES_LOGIN",
-    // 判断是否登录
-    RES_ISLOGIN:"RES_ISLOGIN",
-    // 搜索习惯
-    RES_SEARCH:"RES_SEARCH",
-    // 创建习惯
-    RES_CREATEHABIT:"RES_CREATEHABIT",
-    // 添加习惯
-    RES_ADDHABIT:"RES_ADDHABIT"
-}
+ export const STORE__USER_INFO = "STORE__USER_INFO";
 
-export {req,res}
+
+// 检查用户名
+export const CHECK_USER_NAME = "CHECK_USER_NAME";
+// 用户注册
+export const REGISTER = "REGISTER";
+// 用户登录
+export const LOGIN = "LOGIN";
+// 验证用户权限
+export const ISLOGIN = "ISLOGIN";
+
+
+
+
+
+
 
 
 /**

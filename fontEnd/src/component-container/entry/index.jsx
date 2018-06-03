@@ -9,43 +9,204 @@ import { NavBar, Icon, Button, InputItem, Toast } from 'antd-mobile';
 import { Link, withRouter, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
-
-import { res } from '../../constants/index.js';
-import allAction from '../../action/index.js';
+import * as actionMethod from '../../action/index.js';
 
 import style from './entry.css';
 class entry extends Component {
-
     constructor(props) {
         super(props)
         this.state = {
-            isLogin: false,
-            userName: "",
-            password: "",
-            rePassword: "",
             isRegister: false,
-            isPasswordSame: true,
-            canRegister: false
+            password: "",
+            twoPassword: "",
+            userName: ""
         }
-        this.goBack = this.goBack.bind(this);
-    }
-    goBack() {
-        this.props.history.goBack();
     }
     componentDidMount() {
-        let token = window.localStorage.getItem("token")
-        this.props.allAction.req_isLogin({ token })
+        let {
+            async_isLogin
+        } = this.props.actionMethod;
+        let token = window.localStorage.getItem("token");
+
+        async_isLogin({
+            data: {
+                token: token
+            }
+        })
     }
     componentDidUpdate() {
-        if (this.props.userinfo.data) {
-            if (this.props.userinfo.data.code !== 1 && this.props.userinfo.data.code !== 0 ||
-                this.props.userinfo.data.code === 4) {
-                this.props.history.replace('/my')
+        let {
+            isLogin
+        } = this.props.userinfo;
+
+        if (isLogin) {
+            this.props.history.replace('/my')
+        }
+    }
+    // 检查用户名
+    onCheckUserName(val) {
+        // 如果是注册就检测，如果是登录就存在state
+        let {
+            async_checkUserName,
+            store_userInfo
+        } = this.props.actionMethod;
+
+        this.setState({
+            userName: val
+        }, () => {
+            if (/ /g.test(this.state.userName) ||
+                this.state.userName === "") {
+                store_userInfo({
+                    data: {
+                        isRegisterName: false,
+                        userNameTip: "用户名不能有空"
+                    }
+                })
+            } else if (this.state.isRegister) {
+                async_checkUserName({ userName: this.state.userName })
+            } else {
+                store_userInfo({
+                    data: {
+                        userName: this.state.userName,
+                        isRegisterName: true,
+                        userNameTip: ""
+                    }
+                })
             }
+        })
+    }
+    // 检查密码是否一致
+    onSetPassword(val, type) {
+        // 如果第一个密码是注册状态就进行比对
+        let {
+            store_userInfo
+        } = this.props.actionMethod;
+
+        if (type === "one") {
+            this.setState({
+                password: val
+            }, () => {
+                if (this.state.isRegister) {
+                    this.onCheckPassword()
+                } else if (/ /g.test(this.state.password) ||
+                    this.state.password === "") {
+                    store_userInfo({
+                        data: {
+                            isPassword: false,
+                            passwordTip: "密码不能有为空或空格"
+                        }
+                    })
+                } else {
+                    store_userInfo({
+                        data: {
+                            isPassword: true,
+                            passwordTip: ""
+                        }
+                    })
+                }
+            })
+        } else {
+            this.setState({
+                twoPassword: val
+            }, () => {
+                this.onCheckPassword()
+            })
+        }
+    }
+    // 比对两次密码
+    onCheckPassword() {
+        let {
+            store_userInfo
+        } = this.props.actionMethod;
+        let {
+            password,
+            twoPassword
+        } = this.state;
+
+        if (password === "" ||
+            password !== twoPassword ||
+            / /g.test(password + twoPassword)) {
+            store_userInfo({
+                data: {
+                    isPassword: false,
+                    passwordTip: "两次密码不一致并且不能有空格"
+                }
+            })
+        } else {
+            store_userInfo({
+                data: {
+                    isPassword: true,
+                    passwordTip: "两次密码匹配成功"
+                }
+            })
+        }
+    }
+    // 切换注册登录
+    onTab(tab) {
+        let {
+            store_userInfo
+        } = this.props.actionMethod;
+        let {
+            userName
+        } = this.props.userinfo
+
+        this.setState({
+            isRegister: !this.state.isRegister
+        }, () => {
+            let {
+                userName,
+                password
+            } = this.state;
+
+            this.onCheckUserName(userName);
+            this.onSetPassword(password, "one")
+        })
+    }
+    // 提交
+    onSubmit() {
+        let {
+            isRegister,
+            password,
+            twoPassword
+        } = this.state;
+        let {
+            isRegisterName,
+            isPassword,
+            userName
+        } = this.props.userinfo;
+        let {
+            async_register,
+            async_login
+        } = this.props.actionMethod;
+
+        let canRegister = isRegister && isPassword && isRegisterName;
+        let canLogin = !isRegister && isPassword && isRegisterName;
+
+        if (canRegister) {
+            async_register({
+                userName,
+                password,
+                twoPassword
+            })
+        }
+        if (canLogin) {
+            async_login({
+                userName,
+                password
+            })
         }
     }
 
     render() {
+        let {
+            isRegisterName,
+            userNameTip,
+            isPassword,
+            passwordTip,
+            isLogin,
+            userName
+        } = this.props.userinfo;
+
         return (
             <div className="entry">
                 <NavBar
@@ -61,47 +222,21 @@ class entry extends Component {
                     <InputItem
                         type="text"
                         placeholder="用户名"
-                        onChange={(e) => {
-                            if (this.state.isRegister) {
-                                this.props.allAction.req_checkUserName({ userName: e })
-                            } else {
-                                this.setState({
-                                    userName: e
-                                })
-                            }
-
-                        }}
+                        onChange={(e) => { this.onCheckUserName(e) }}
+                        onFocus={(e) => { this.onCheckUserName(e) }}
                     >用户名</InputItem>
                     <p className={`${style.tip}`}>
-                        {
-                            this.state.isRegister && this.props.userinfo.data ?
-                                this.props.userinfo.data.code === 0 ? this.props.userinfo.data.msg : "" : ""}
+                        {!isRegisterName ? userNameTip : ''}
                     </p>
 
                     <InputItem
                         type="password"
                         placeholder="密码"
                         onChange={(e) => {
-                            if (this.state.isRegister) {
-                                if (e.replace(/ /g, "") === "" || e !== this.state.rePassword) {
-
-                                    this.setState({
-                                        password: e.replace(/ /g, ""),
-                                        isPasswordSame: false
-                                    })
-                                } else {
-                                    this.setState({
-                                        password: e.replace(/ /g, ""),
-                                        isPasswordSame: true
-                                    })
-                                }
-                            } else {
-                                this.setState({
-                                    password: e,
-                                    // isPasswordSame: true
-                                })
-                            }
-
+                            this.onSetPassword(e, "one")
+                        }}
+                        onFocus={(e) => {
+                            this.onSetPassword(e, "one")
                         }}
                     >密码</InputItem>
                     {
@@ -111,47 +246,30 @@ class entry extends Component {
                                     type="password"
                                     placeholder="密码"
                                     onChange={(e) => {
-                                        if (e.replace(/ /g, "") === "" || e !== this.state.password) {
-                                            this.setState({
-                                                rePassword: e.replace(/ /g, ""),
-                                                isPasswordSame: false
-                                            })
-                                        } else {
-                                            this.setState({
-                                                rePassword: e.replace(/ /g, ""),
-                                                isPasswordSame: true
-                                            })
-                                        }
+                                        this.onSetPassword(e, "two")
+                                    }}
+                                    onFocus={(e) => {
+                                        this.onSetPassword(e, "two")
                                     }}
                                 >确认密码</InputItem>
-
                             </div>
                         ) : ""
                     }
-                    <p className={`${style.tip}`}>{
-                        this.state.isRegister ?
-                            this.state.isPasswordSame ? '' : '两次密码要一致并且不能有空格'
-                            :
-                            this.props.userinfo.data ? this.props.userinfo.data.msg :
-                                ''
-                    }</p>
+                    <p className={`${style.tip}`}>
+                        {!isPassword ? passwordTip : ''}
+                    </p>
 
                     <div className={`${style.tab}`} >
-                        <span
-                            onClick={(e) => {
-                                this.setState({
-                                    isRegister: !this.state.isRegister
-                                }, () => {
-                                    if (this.state.isRegister) {
-                                        this.props.allAction.req_checkUserName({ userName: this.state.userName })
-
-                                    //    console.log(this.state.password)
-                                    }
-                                })
-
-                            }}
+                        {/* <span
+                            onClick={(e) => { this.onTab('forget') }}
                         >
-                            {this.state.isRegister ? "登录" : "注册"}
+                            忘记密码
+                        </span>
+                        &nbsp;&nbsp; */}
+                        <span
+                            onClick={(e) => { this.onTab() }}
+                        >
+                            {this.state.isRegister ? "登陆" : "注册"}
                         </span>
                     </div>
                     <div className={`${style.btn}`}>
@@ -159,46 +277,9 @@ class entry extends Component {
                             type="primary"
                             activeClassName={`${style.active}`}
                             className={`${style.button}`}
-                            onClick={(e) => {
-                                // if (this.state.isRegister && !this.props.userinfo.data) {
-                                //     Toast.info('用户名不能有空格', 2, null, false);
-                                //     return;
-                                // }
-                                let name = "",
-                                    password = this.state.password,
-                                    rePassword = this.state.rePassword;
-
-                                // 密码不能为空
-                                if (password === "" || this.state.isRegister && rePassword === "") {
-                                    Toast.info('表单不能有留空', 2, null, false);
-                                    return;
-                                }
-                                // 两次密码要相等
-                                if (this.state.isRegister && !this.state.isPasswordSame) {
-                                    Toast.info('两次密码输入不一致', 2, null, false);
-                                    return;
-                                }
-
-                                if (this.state.isRegister) {
-                                    console.log(222)
-                                    name = this.props.userinfo.data.name ? this.props.userinfo.data.name :
-                                        this.state.userName,
-                                        this.props.allAction.req_register({
-                                            name,
-                                            password,
-                                            rePassword
-                                        })
-                                } else {
-                                    name = this.state.userName ? this.state.userName : this.props.userinfo.data.name
-
-                                    this.props.allAction.req_login({
-                                        name,
-                                        password
-                                    })
-                                }
-                            }}
+                            onClick={(e) => { this.onSubmit() }}
                         >
-                            {this.state.isRegister ? "注册" : "登录"}
+                            {this.state.isRegister ? "注册" : "登陆"}
                         </Button>
                     </div>
 
@@ -208,13 +289,14 @@ class entry extends Component {
     }
 }
 const mapStateToProps = (state) => {
-    let userinfo = state.userinfo
-    console.log(userinfo.data)
+    let {
+        userinfo
+    } = state
     return { userinfo };
 }
 const mapDispatchToProps = (dispath) => {
     return {
-        allAction: bindActionCreators(allAction, dispath)
+        actionMethod: bindActionCreators(actionMethod, dispath)
     }
 }
 const entry_withRouter = withRouter(entry)
@@ -225,7 +307,3 @@ const Entry = connect(
 export { Entry }
 
 
-/**
- * 明天
- * 注册成功后自动登录，然后跳转到发现页。
- */

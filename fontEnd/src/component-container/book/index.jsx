@@ -6,8 +6,7 @@ import { Link, Route, BrowserRouter, Switch, Redirect, withRouter } from 'react-
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
-import { res } from '../../constants/index.js';
-import allAction from '../../action/index.js';
+import * as actionMethod from '../../action/index.js';
 
 import WxImageViewer from 'react-wx-images-viewer';
 import Detail from '../detail/index.jsx';
@@ -34,19 +33,26 @@ class book extends Component {
         this.goBack = this.goBack.bind(this);
         this.openViewer = this.openViewer.bind(this)
     }
-    componentDidMount(){
-        let token = window.localStorage.getItem("token")
-        this.props.allAction.req_isLogin({ token })
-    }
+    componentDidMount() {
+        let {
+            async_isLogin
+        } = this.props.actionMethod;
 
-    componentDidUpdate() {
-        console.log(this.props.userinfo.data)
-        if (this.props.userinfo.data) {
-            if (this.props.userinfo.data.code === 0) {
-                this.props.history.replace('/entry')
-            } else {
-                console.log("已登录")
+        let token = window.localStorage.getItem("token");
+
+        async_isLogin({
+            data: {
+                token: token
             }
+        })
+    }
+    componentDidUpdate() {
+        let {
+            isLogin
+        } = this.props.userinfo;
+
+        if (!isLogin) {
+            this.props.history.replace('/entry')
         }
     }
     onChange = (files, type, index) => {
@@ -210,14 +216,16 @@ class book extends Component {
         )
     }
 }
+
 const mapStateToProps = (state) => {
-    let userinfo = state.userinfo
-    // console.log(userinfo)
+    let {
+        userinfo
+    } = state
     return { userinfo };
 }
 const mapDispatchToProps = (dispath) => {
     return {
-        allAction: bindActionCreators(allAction, dispath)
+        actionMethod: bindActionCreators(actionMethod, dispath)
     }
 }
 const book_withRouter = withRouter(book)

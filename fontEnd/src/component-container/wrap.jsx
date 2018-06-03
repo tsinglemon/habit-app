@@ -5,8 +5,8 @@ import { renderRoutes } from 'react-router-config';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
-import { res } from '../constants/index.js';
-import allAction from '../action/index.js';
+
+import * as actionMethod from '../action/index.js';
 
 import Habit from '../component-container/habit.jsx';
 import { Discover } from '../component-container/discover.jsx';
@@ -27,26 +27,26 @@ class wrap extends Component {
         }
     }
     componentDidMount() {
-        let token = window.localStorage.getItem("token")
-        this.props.allAction.req_isLogin({ token })
+        let {
+            async_isLogin
+        } = this.props.actionMethod;
+
+        let token = window.localStorage.getItem("token");
+
+        async_isLogin({
+            data: {
+                token: token
+            }
+        })
     }
     componentDidUpdate() {
-        console.log(this.props.userinfo.data)
-        if (this.props.userinfo.data) {
-            if (this.props.userinfo.data.code === 0) {
-                this.props.history.replace('/entry')
-            } else {
-                console.log("已登录")
-            }
+        let {
+            isLogin
+        } = this.props.userinfo;
+
+        if (!isLogin) {
+            this.props.history.replace('/entry')
         }
-        // if(this.props.userinfo.data){
-        //     let isLogin = this.props.userinfo.data.isLogin;
-        //     if(!isLogin) {
-        //         this.props.history.replace('/entry')
-        //     }else{
-        //         this.props.history.replace('/')
-        //     }
-        // }
     }
 
     render() {
@@ -169,13 +169,14 @@ class wrap extends Component {
 
 }
 const mapStateToProps = (state) => {
-    let userinfo = state.userinfo
-    // console.log(userinfo)
+    let {
+        userinfo
+    } = state
     return { userinfo };
 }
 const mapDispatchToProps = (dispath) => {
     return {
-        allAction: bindActionCreators(allAction, dispath)
+        actionMethod: bindActionCreators(actionMethod, dispath)
     }
 }
 const wrap_withRouter = withRouter(wrap)
