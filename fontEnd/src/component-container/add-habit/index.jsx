@@ -24,6 +24,7 @@ class addHabit extends Component {
     }
     componentDidMount() {
         this.autoFocusInst.focus();
+        this.autoFocusInst.doClear()
         let {
             async_isLogin
         } = this.props.actionMethod;
@@ -38,6 +39,9 @@ class addHabit extends Component {
         let {
             isLogin
         } = this.props.userinfo;
+        let {
+            store_habitData
+        } = this.props.actionMethod
 
         if (!isLogin) {
             this.props.history.replace('/entry')
@@ -50,41 +54,84 @@ class addHabit extends Component {
         this.props.history.goBack()
     }
     onChange(val) {
-        
+        let {
+            async_searchHabit
+        } = this.props.actionMethod;
+        let userId = window.localStorage.getItem('userId');
+        let habitName = val ? val.replace(/ /g, '') : "";
+        async_searchHabit({
+            userId,
+            habitName
+        })
     }
-    createHabit(val) {
-        
+    createHabit(val, index) {
+        let {
+            async_createHabit
+        } = this.props.actionMethod;
+        let {
+            searchResult
+        } = this.props.habit;
+        let userId = window.localStorage.getItem('userId');
+
+        async_createHabit({
+            habitName: val,
+            userId
+        })
     }
-    addHabit(val) {
-        
+    addHabit(val, index) {
+        let {
+            async_addHabit
+        } = this.props.actionMethod;
+        let {
+            searchResult
+        } = this.props.habit;
+        let userId = window.localStorage.getItem('userId');
+
+        async_addHabit({
+            habitId: searchResult[index].habitId,
+            userId
+        })
+
     }
-    addList() {
-        let add = this.props.userinfo.data.msg.map((el, i) => {
-            
+    searchList() {
+        let {
+            searchResult
+        } = this.props.habit;
+
+        let showResult = searchResult.map((el, index) => {
             return (
                 <List.Item
                     extra={
                         <Button
                             type="primary"
                             size="small"
-                            className={`${style.addBtn}`}
+                            className={el.stateName === '已加入' ? `${style.disableBtn}` : `${style.addBtn}`}
                             activeClassName={`${style.active}`}
-                            onClick={(e) => { this.addHabit(el._id) }}
-                        >加入</Button>
+                            onClick={(e) => {
+                                if (el.stateName === '创建') {
+                                    this.createHabit(el.habitName)
+                                } else {
+                                    this.addHabit(el.habitName, index)
+                                }
+                            }}
+                            disabled={el.stateName === '已加入'}
+                        >{el.stateName}</Button>
                     }
                     multipleLine
-                    key={i}
-                >   
+                    key={index}
+                    style={typeof el.userCount === 'number' ? {} : { borderBottom: '4px solid #baeac2' }}
+                >
                     {<div className={`${style.habitName}`}>
                         {el.habitName}
                     </div>}
                     <List.Item.Brief className={`${style.joinCount}`}>
-                        {`${el.userCount}`}人参与
+                        {typeof el.userCount === 'number' ?
+                            `${el.userCount}人参与` : el.userCount}
                     </List.Item.Brief>
                 </List.Item>
             )
         })
-        return add
+        return showResult
     }
 
 
@@ -100,42 +147,15 @@ class addHabit extends Component {
                         ref={ref => this.autoFocusInst = ref}
                         showCancelButton={false}
                         onCancel={() => {
-                            document.querySelector(".am-search-clear").click()
-                            document.querySelector(".am-search-value").blur()
+                            this.autoFocusInst.doClear()
                         }}
                         onChange={(val) => { this.onChange(val) }}
                     />
-
                 </div>
-                {/* 创建 */}
-                {this.props.userinfo.data && this.props.userinfo.data.code === 11 ? (
-                    <List>
-                        <List.Item
-                            extra={
-                                <Button
-                                    type="primary"
-                                    size="small"
-                                    className={`${style.addBtn}`}
-                                    activeClassName={`${style.active}`}
-                                    onClick={(e) => { this.createHabit(this.props.userinfo.data.habitName) }}
-                                >创建</Button>
-                            }
-                            multipleLine
-                            onClick={() => { }}
-                        >
-                            {<div className={`${style.habitName}`}>
-                                {this.props.userinfo.data.habitName}
-                            </div>}
-                            <List.Item.Brief className={`${style.joinCount}`}>未创建</List.Item.Brief>
+                <List className={`${style.searchList}`}>
 
-                        </List.Item>
-                    </List>) : ''}
-
-                {/* 加入 */}
-                {this.props.userinfo.data && this.props.userinfo.data.code === 12&&this.props.userinfo.data.code!==10 ? (
-                    <List>
-                        {this.addList()}
-                    </List>) : ''}
+                    {this.searchList()}
+                </List>
             </div>
         )
     }
@@ -144,9 +164,10 @@ class addHabit extends Component {
 
 const mapStateToProps = (state) => {
     let {
-        userinfo
+        userinfo,
+        habit
     } = state;
-    return { userinfo };
+    return { userinfo, habit };
 }
 const mapDispatchToProps = (dispath) => {
     return {

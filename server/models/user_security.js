@@ -9,7 +9,7 @@ const db = require('./db.js')
 const Schema = mongoose.Schema;
 
 var option = {
-    name: String,
+    userName: String,
     password: String,
     token:String
 }

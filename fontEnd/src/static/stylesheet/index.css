@@ -60,7 +60,7 @@ body .am-popover-mask {
 .per-habit-item .am-list-line .am-list-brief {
     margin:0;
     padding:0;
-    font-size:14px;
+    font-size:12px;
     color:#999
 }
 .per-habit-item.am-list-item .am-list-thumb:first-child {
@@ -99,9 +99,17 @@ body .am-popover-mask {
 .tabHeight .habitTop {
     justify-content: flex-end;
 }
-
+/* 删除习惯的modal */
+.del_modal {
+    padding:0 20px;
+}
 
 /* 评论的蒙版 */
+.detail_wrap {
+    border:1px solid;    
+    position: fixed;
+    bottom: -1px;
+}
 .am-modal-mask {
     background-color: #000.5;
 }
@@ -112,7 +120,7 @@ body .am-popover-mask {
     padding:0;
 }
 .am-modal-wrap {
-    align-items: flex-end;
+    /* align-items: flex-end; */
 }
 .am-modal-transparent {
     width:100%;

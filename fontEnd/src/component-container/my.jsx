@@ -35,13 +35,17 @@ class my extends Component {
         let {
             isLogin
         } = this.props.userinfo;
-
         if (!isLogin) {
             this.props.history.replace('/entry')
         }
     }
     outLogin() {
+        let {
+            store_clear
+        } = this.props.actionMethod;
         window.localStorage.clear();
+        store_clear({})
+        
         this.props.history.replace('/entry')
     }
 
@@ -71,7 +75,8 @@ class my extends Component {
 
 const mapStateToProps = (state) => {
     let {
-        userinfo
+        userinfo,
+        habit
     } = state
     return { userinfo };
 }

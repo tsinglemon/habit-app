@@ -13,7 +13,7 @@ export default class extends Component {
             <div className={`${style.head_wrap}`}>
                 <div className={`${style.head_userInfo}`} >
                     <Link to="/discover" className={`${style.head_pic}`}>
-                        <img src="http://192.168.1.101:3008/images/default_head.jpg" alt="" />
+                        <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
                     </Link>
                     <div className={`${style.head_description}`}>
                         <h3 className={`${style.head_userName}`}> <Link to="/discover/">Canvas</Link> </h3>

@@ -68,19 +68,19 @@ class wrap extends Component {
                         icon={<div style={{
                             width: '24px',
                             height: '24px',
-                            background: 'url(http://192.168.1.101:3008/icon-svg/habit.svg) center center /  24px 24px no-repeat'
+                            background: 'url(http://192.168.1.105:3008/icon-svg/habit.svg) center center /  24px 24px no-repeat'
                         }}
                         />
                         }
                         selectedIcon={<div style={{
                             width: '24px',
                             height: '24px',
-                            background: 'url(http://192.168.1.101:3008/icon-svg/habit-selected.svg) center center /  24px 24px no-repeat'
+                            background: 'url(http://192.168.1.105:3008/icon-svg/habit-selected.svg) center center /  24px 24px no-repeat'
                         }}
                         />
                         }
                         selected={this.state.selectedTab === 'habit'}
-                        badge={1}
+                        // badge={1}
                         onPress={() => { this.props.history.replace('/habit') }}
                         data-seed="logId"
                     >
@@ -92,7 +92,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/discover.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/discover.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -100,13 +100,13 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/discover-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/discover-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
                         title="发现"
                         key="discover"
-                        badge={'new'}
+                        badge={''}
                         selected={this.state.selectedTab === 'discover'}
                         onPress={() => { this.props.history.replace('/discover') }}
                         data-seed="logId1"
@@ -118,7 +118,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/favorite.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/favorite.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -126,13 +126,13 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/favorite-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/favorite-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
                         title="收藏"
                         key="favorite"
-                        dot
+                        // dot
                         selected={this.state.selectedTab === 'favorite'}
                         onPress={() => { this.props.history.replace('/favorite') }}
                     >
@@ -143,19 +143,20 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/my.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/my.svg) center center /  24px 24px no-repeat'
                             }}
                             />}
                         selectedIcon={
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.101:3008/icon-svg/my-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://192.168.1.105:3008/icon-svg/my-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
                         title="我的"
                         key="my"
+                        badge={0}
                         selected={this.state.selectedTab === 'my'}
                         onPress={() => { this.props.history.replace('/my') }}
                     >

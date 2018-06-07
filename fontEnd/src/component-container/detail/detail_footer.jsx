@@ -63,7 +63,7 @@ export default class extends Component {
         // 提交评论，dispath到saga里处理这个异步
         console.log("提交评论")
         let isEle = document.querySelector('.am-input-clear');
-        isEle?isEle.click():"";
+        isEle ? isEle.click() : "";
         this.setState({
             comment: ""
         })
@@ -84,6 +84,7 @@ export default class extends Component {
                     transparent
                     maskClosable={true}
                     onClose={this.onClose('modal')}
+                    className='detail_wrap'
                     title={
                         <div className={`${style.comment_title}`}>
                             <span>评论</span>
@@ -96,7 +97,7 @@ export default class extends Component {
                     footer={[{
                         text: (
                             <div className="comment_input">
-                                <InputItem 
+                                <InputItem
                                     clear={true}
                                     onChange={this.changeValue}>
                                     <span className="comment_btn" onClick={this.sendValue}>GO</span>

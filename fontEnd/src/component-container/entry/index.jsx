@@ -38,7 +38,6 @@ class entry extends Component {
         let {
             isLogin
         } = this.props.userinfo;
-
         if (isLogin) {
             this.props.history.replace('/my')
         }
@@ -93,7 +92,7 @@ class entry extends Component {
                     store_userInfo({
                         data: {
                             isPassword: false,
-                            passwordTip: "密码不能有为空或空格"
+                            passwordTip: "密码不能为空或空格"
                         }
                     })
                 } else {

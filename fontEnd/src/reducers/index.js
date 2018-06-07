@@ -8,9 +8,11 @@ import {combineReducers} from 'redux';
 
 // 引入子规则
 import userinfo from './userinfo';
+import habit from './habit';
 // 合并子规则
 const rootReducer = combineReducers({
-    userinfo
+    userinfo,
+    habit
 });
 // 导出规则集合
 export default rootReducer;

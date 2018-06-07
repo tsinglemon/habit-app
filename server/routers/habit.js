@@ -40,25 +40,107 @@ const user_info = require('../models/user_info.js')
 const user_attention = require('../models/user_attention.js')
 
 
+// 获取个人加入的习惯
+router.get('/getHabits', (req, res) => {
+    let userId = req.query.userId;
+    user_info.findOne({
+        user: userId
+    }).populate({
+        path: "habits.habit"
+    }).exec((err, msg) => {
+        res.json({
+            habitList: msg
+        })
+    })
+})
 
 // 搜索习惯
 router.get('/search', (req, res) => {
     let habitName = req.query.habitName;
-    if (!habitName) res.json({ code: 2, msg: "字符不能为空" });
+    let userId = req.query.userId;
+    let page = req.query.page;
+    // let reg = new RegExp('^'+habitName+'$','i');
+    let reg = new RegExp(habitName, 'i');
+
+    if (!habitName) {
+        res.json({
+            searchResult: [],
+            isUpdate: false
+        })
+        return;
+    }
 
     habit_all.find({
-        habitName
-    }, (err, msg) => {
-        if (err) return;
-        if (!msg[0]) {
-            res.json({
-                code: 1,
-                msg: "没有该习惯，是否创建？"
-            })
-        } else {
-            res.json({ code: 0, msg })
+        habitName: {
+            $regex: reg
         }
-    })
+    },
+        null,
+        (err, allHabit) => {
+            if (err) return;
+
+            user_info.findOne({
+                user: userId
+            }).populate({
+                path: "habits.habit"
+            }).exec((err, msg) => {
+                // 确保习惯是唯一的
+                habit_all.findOne({
+                    habitName
+                }, (err, oneResult) => {
+                    // 获取已经加入的习惯
+                    let myHabits = msg.habits.map((item, i) => {
+                        return {
+                            habitName: item.habit.habitName,
+                            stateName: '已加入',
+                        }
+                    })
+                    // 把精确匹配的结果搬到列表最上面，如果没有精确匹配的结果就按数据库读取顺序显示
+                    let topResult = allHabit.find((item) => {
+                        return item.habitName === habitName
+                    })
+                    let topIndex = allHabit.findIndex((item) => {
+                        return item.habitName === habitName
+                    })
+                    if (topIndex !== -1) {
+                        allHabit.splice(topIndex, 1)
+                        allHabit.unshift(topResult);
+                    }
+                    // 初始化搜索出来的结果
+                    let searchHaibts = allHabit.map((item, i) => {
+                        return {
+                            habitId: item._id,
+                            thum: item.thum,
+                            habitName: item.habitName,
+                            userCount: item.userCount,
+                            stateName: '加入',
+                        }
+                    })
+                    // 合并搜索出的习惯和自己已加入的习惯
+                    searchResult = searchHaibts.map((item, index) => {
+                        let update = myHabits.find(
+                            (el) => {
+                                return el.habitName === item.habitName
+                            });
+                        return update ? { ...item, ...update } : item
+                    })
+                    // 把未创建的习惯搬到结果的最上面
+                    if (!oneResult && habitName !== '') {
+                        searchResult.unshift({
+                            userCount: '未创建',
+                            stateName: '创建',
+                            habitName
+                        })
+                    }
+
+                    res.json({
+                        searchResult,
+                        isUpdate: false
+                    })
+                })
+            })
+            return;
+        })
 })
 // 创建新习惯
 router.get('/createHabit', (req, res) => {
@@ -72,13 +154,17 @@ router.get('/createHabit', (req, res) => {
             res.json(err)
             return;
         }
+
         if (!msg) {
             habit_all.create({
                 habitName,
                 userCount: 1,
                 thum: "/images/default_habit.jpg"
             }, (err, msg) => {
-                habitId = msg._id;
+                let {
+                    _id: habitId,
+                    userCount
+                } = msg
 
                 user_info.update({
                     user: userId
@@ -86,19 +172,27 @@ router.get('/createHabit', (req, res) => {
                         $push: {
                             "habits": [{
                                 habit: habitId,
-                                createDate: new Date()
+                                createDate: new Date(),
+                                count: 0,
+                                isClockIn: false
                             }]
                         }
                     }, (err, msg) => {
                         res.json({
-                            code: 0,
-                            msg
+                            searchResult: [
+                                {
+                                    habitName,
+                                    userCount,
+                                    stateName: '已加入'
+                                }
+                            ],
+                            isUpdate: true
                         })
                     })
             })
         } else {
             res.json({
-                code: 1,
+                code: 10,
                 msg: "习惯已存在"
             })
         }
@@ -134,7 +228,7 @@ router.get('/addHabit', (req, res) => {
     }, (err, msg) => {
         if (msg) {
             res.json({
-                code: 1,
+                code: 10,
                 msg: "您已添加该习惯"
             })
         } else {
@@ -149,27 +243,44 @@ router.get('/addHabit', (req, res) => {
                             isClockIn: false
                         }]
                     }
-                }, (err, msg) => {
-                    res.json({
-                        code: 0,
-                        msg
-                    })
+                }, (err) => {
+                    habit_all.findOneAndUpdate({
+                        _id: habitId
+                    }, {
+                            $inc: {
+                                "userCount": +1
+                            }
+                        }, {
+                            new: true
+                        }, (err, msg) => {
+                            res.json({
+                                searchResult: [
+                                    {
+                                        habitId: msg._id,
+                                        userCount: msg.userCount,
+                                        stateName: '已加入'
+                                    }
+                                ],
+                                isUpdate: true
+                            })
+                        })
                 })
         }
     })
 })
-// 删除个人里的习惯
+// 删除个人的习惯
 router.get('/delHabit', (req, res) => {
 
     let habitId = req.query.habitId;
     let userId = req.query.userId;
+
     user_info.findOne({
         user: userId,
         "habits.habit": habitId
     }, (err, msg) => {
         if (!msg) {
             res.json({
-                code: 1,
+                code: 10,
                 msg: "您还没添加该习惯"
             })
         } else {
@@ -182,10 +293,22 @@ router.get('/delHabit', (req, res) => {
                         }
                     }
                 }, (err, msg) => {
-                    res.json({
-                        code: 0,
-                        msg
-                    })
+                    habit_all.findOneAndUpdate({
+                        _id: habitId
+                    }, {
+                            $inc: {
+                                "userCount": -1
+                            }
+                        }, (err, msg) => {
+                            res.json({
+                                habitList: [
+                                    {
+                                        habitId
+                                    }
+                                ],
+                                isUpdate: true
+                            })
+                        })
                 })
         }
     })
@@ -604,8 +727,8 @@ router.get('/getOtherList', (req, res) => {
             user_attention.findOne({
                 user: myId,
                 attention: otherAttention
-            },(err,msg)=>{
-                if(msg){
+            }, (err, msg) => {
+                if (msg) {
                     obj = {
                         user: myId,
                         attention: otherAttention,
@@ -613,16 +736,16 @@ router.get('/getOtherList', (req, res) => {
                     }
                 }
                 // 如果没有这条文档，那肯定没有关注过，也就不可能会有互粉这些
-                else{
+                else {
                     obj = {
                         user: myId,
                         attention: otherAttention,
-                        state: {isLike:false,mutual:false}
+                        state: { isLike: false, mutual: false }
                     }
                 }
                 result.push(obj);
                 // 没有用propmis，简单粗暴用这个解决异步查询
-                if(index>=msgLength-1){
+                if (index >= msgLength - 1) {
                     res.json(result)
                 }
             })

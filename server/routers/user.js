@@ -6,7 +6,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const app = express();
 
-// 连接students数据库
+// 连接数据库
 const db = require('../models/db.js')
 const user_security = require('../models/user_security.js')
 const user_info = require('../models/user_info.js')
@@ -15,59 +15,73 @@ const user_info = require('../models/user_info.js')
 app.set('superSecret', "superSecret");
 
 router.post('/checkUserName', (req, res) => {
-    let name = req.body.name;
-    if(!name){
+    let userName = req.body.userName;
+    if (!userName || / /g.test(userName)) {
         res.json({
-            msg:"用户名不能为空",
-            code:1
+            userNameTip: "用户名不能有空格",
+            isRegisterName: false
         })
+        return
     }
 
-    user_security.findOne({ name }, (err, msg) => {
+    user_security.findOne({ userName }, (err, msg) => {
         if (msg) {
             res.json({
-                name,
-                msg: "该用户已注册",
-                code: 1
+                userName,
+                userNameTip: "该用户已注册",
+                isRegisterName: false
             });
         } else {
             res.json({
-                name,
-                msg: "该用户可以注册",
-                code: 0
+                userName,
+                userNameTip: "该用户可以注册",
+                isRegisterName: true
             });
         }
     })
 })
 router.post('/register', (req, res) => {
-    let name = req.body.name;
+    let userName = req.body.userName;
     let password = req.body.password;
-    let rePassword = req.body.rePassword;
+    let twoPassword = req.body.twoPassword;
     let token = "";
-
-    user_security.findOne({ name }, (err, msg) => {
+    if (password !== twoPassword ||
+        / /g.test(password + twoPassword)) {
+        res.json({
+            passwordTip: "两次密码不一致",
+            isPassword: false
+        })
+        return;
+    }
+    if (!userName || / /g.test(userName)) {
+        res.json({
+            userNameTip: "用户名不能有空格",
+            isRegisterName: false
+        })
+        return
+    }
+    user_security.findOne({ userName }, (err, msg) => {
         if (msg) {
             res.json({
-                name,
-                msg: "该用户已注册",
-                code: 1
+                userName,
+                userNameTip: "该用户已注册",
+                isRegisterName: false
             });
         } else {
-            if(password!==rePassword) return;
             // 新建用户
-            token = jwt.sign({ msg }, app.get('superSecret'), {
+            token = jwt.sign({ userName, password }, app.get('superSecret'), {
                 expiresIn: 60 * 60 * 24
             });
-            user_security.create({ name, password, token }, (err, msg) => {
-
+            user_security.create({ userName, password, token }, (err, msg) => {
+                let userId = msg._id;
                 user_info.create({
                     user: msg._id,
                     headPic: "/images/default_head.jpg",
                     attitude: "世界很美！"
                 }, (err, msg) => {
                     res.json({
-                        msg: "注册成功！",
-                        code: 0,
+                        userId: userId,
+                        isLogin: true,
                         token
                     })
                 })
@@ -77,55 +91,94 @@ router.post('/register', (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-    let name = req.body.name;
+    let userName = req.body.userName;
     let password = req.body.password;
     let token = ""
-    user_security.findOne({ name }, (err, msg) => {
+    user_security.findOne({ userName }, (err, msg) => {
         if (!msg) {
-            res.json({ name, msg: "该用户未注册", code: 1 });
+            res.json({ userName, userNameTip: "该用户未注册", isRegisterName: false });
         } else if (msg.password !== password) {
-            res.json({ msg: "密码错误", code: 2 });
+            res.json({ passwordTip: "密码错误", isPassword: false });
         } else {
-            token = jwt.sign({ name, password }, app.get("superSecret"), {
+            token = jwt.sign({ userName, password }, app.get("superSecret"), {
                 expiresIn: 60 * 60 * 24
             });
+            let userId = msg._id;
             // 登录成功后 更新token
-            user_security.update({ name }, { token }, function (err, msg) {
+            user_security.update({ userName }, { token }, function (err, msg) {
                 res.json({
-                    token: token,
-                    code: 0,
-                    msg: "登陆成功"
+                    token,
+                    userId,
+                    isLogin: true
                 })
             })
         }
+    })
+})
+router.post('/islogin', (req, res) => {
+    let token = req.body.token;
+    user_security.findOne({
+        token
+    }, (err, msg) => {
+        if (!msg) {
+            res.json({
+                isLogin: false
+            });
+            return;
+        }
+        jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+            if (err) {
+                res.json({
+                    isLogin: false
+                });
+            } else {
+                user_security.findOne({
+                    userName: decoded.userName,
+                    password: decoded.password
+                }, (err, msg) => {
+                    if (err || !msg) {
+                        res.json({
+                            isLogin: false,
+                        })
+                    } else {
+                        res.json({
+                            isLogin: true,
+                            token,
+                            userId: msg._id
+                        })
+                    }
+                })
+            }
+        });
     })
 })
 
-router.post('/changePassword', (req, res) => {
-    let name = req.body.name;
-    let oldPassword = req.body.oldPassword;
-    let newPassword = req.body.newPassword;
-    let token = ""
-    user_security.findOne({ name }, (err, msg) => {
-        if (!msg) {
-            res.json({ name, msg: "该用户未注册", code: 1 });
-        } else if (msg.password !== oldPassword) {
-            res.json({ msg: "旧密码错误", code: 2 });
-        } else {
-            token = jwt.sign({ name, password: newPassword }, app.get("superSecret"), {
-                expiresIn: 60 * 60 * 24
-            });
-            // 登录成功后 更新token
-            user_security.update({ name }, { token, password: newPassword }, function (err, msg) {
-                res.json({
-                    token: token,
-                    code: 0,
-                    msg: "密码修改成功"
-                })
-            })
-        }
-    })
-})
+// 修改密码
+// router.post('/changePassword', (req, res) => {
+//     let userName = req.body.userName;
+//     let oldPassword = req.body.oldPassword;
+//     let newPassword = req.body.newPassword;
+//     let token = ""
+//     user_security.findOne({ userName }, (err, msg) => {
+//         if (!msg) {
+//             res.json({ userName, msg: "该用户未注册", code: 0 });
+//         } else if (msg.password !== oldPassword) {
+//             res.json({ msg: "旧密码错误", code: 0 });
+//         } else {
+//             token = jwt.sign({ userName, password: newPassword }, app.get("superSecret"), {
+//                 expiresIn: 60 * 60 * 24
+//             });
+//             // 登录成功后 更新token
+//             user_security.update({ userName }, { token, password: newPassword }, function (err, msg) {
+//                 res.json({
+//                     token: token,
+//                     code: 5,
+//                     msg: "密码修改成功"
+//                 })
+//             })
+//         }
+//     })
+// })
 
 module.exports = router;
 
@@ -136,3 +189,4 @@ module.exports = router;
 //         res.json({ msg: "登录成功", code: 0 })
 //     }
 // });
+
