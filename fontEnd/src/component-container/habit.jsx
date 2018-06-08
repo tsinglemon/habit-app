@@ -106,7 +106,7 @@ class habit extends Component {
             habitList
         } = this.props.habit;
 
-        if (!habitList.habits) return;
+        if (!habitList||!habitList.habits) return;
 
         let showHabits = habitList.habits.map((item, index) => {
 
