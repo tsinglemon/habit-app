@@ -21,12 +21,13 @@ class book extends Component {
         this.state = {
             visible: false,
             selected: '',
-            isBook: false,
             files: [],
+            text: '',
             viewFile: [],
             isOpen: false,
             index: 0,
             bookWay: "simple"
+
         };
         this.handleVisibleChange = this.handleVisibleChange.bind(this)
         this.onSelect = this.onSelect.bind(this)
@@ -35,16 +36,36 @@ class book extends Component {
     }
     componentDidMount() {
         let {
-            async_isLogin
+            async_isLogin,
+            async_getHabit,
+            async_getRecord
         } = this.props.actionMethod;
-
+        let {
+            habitList = []
+        } = this.props.habit;
         let token = window.localStorage.getItem("token");
-
+        let userId = window.localStorage.getItem("userId");
+        let {
+            id: habitId
+        } = this.props.match.params;
         async_isLogin({
             data: {
                 token: token
             }
         })
+        if (!(habitList.habits && habitList.habits[0])) {
+            async_getHabit({
+                userId
+            })
+        }
+        // 获取签到的习惯的图文
+        async_getRecord({
+            userId,
+            habitId
+        })
+
+
+
     }
     componentDidUpdate() {
         let {
@@ -67,6 +88,17 @@ class book extends Component {
             isOpen: false
         })
     }
+    onBook(habitId) {
+        let {
+            async_bookHabit
+        } = this.props.actionMethod;
+        let userId = window.localStorage.getItem("userId");
+
+        async_bookHabit({
+            userId,
+            habitId
+        })
+    }
 
     openViewer(fs, index) {
         let viewFile = []
@@ -81,7 +113,7 @@ class book extends Component {
 
     }
     onSelect(opt, index) {
-        switch(opt.props.value){
+        switch (opt.props.value) {
             case "del": (
                 this.goBack("del")
             )
@@ -93,25 +125,66 @@ class book extends Component {
         });
     };
     goBack(val) {
-        if(val!=="del"){
-            this.state.bookWay==="record"?(
-                this.setState({
-                    bookWay:"simple"
-                })
-            ):this.props.history.goBack()
-        }else{
+        let {
+            store_recordData
+        } = this.props.actionMethod;
+
+        if (this.state.bookWay === "record") {
+            this.setState({
+                bookWay: "simple"
+            })
+        } else {
+            // TODO 强行清空会在返回瞬间无谓加载了一次页面，解决办法是给每个习惯定义一个键。
+            // 目前的办法只是为了在返回的时候闪屏，故意延迟200毫秒
+
             this.props.history.goBack()
+            setTimeout(() => {
+                store_recordData({
+                    data: {
+                        type: '-',
+                        key: 'personalRecord',
+                        recordList: []
+                    }
+                })
+            }, 200)
         }
-        
     }
-    renderBook(value) {
+    issue(val) {
+        let {
+            text,
+            files
+        } = this.state;
+        let {
+            async_issueRecord
+        } = this.props.actionMethod;
+        let {
+            id: habitId
+        } = this.props.match.params;
+        let userId = window.localStorage.getItem('userId');
+        if (text.trim() === '') return;
+        async_issueRecord({
+            text,
+            files,
+            userId,
+            habitId
+        })
+        this.state.bookWay === "record" ? (
+            this.setState({
+                bookWay: "simple"
+            })
+        ) : '';
+    }
+    renderBook(value, bookHabit) {
+        let {
+            data,
+            habit,
+            isClockIn,
+        } = bookHabit;
         let simple = (
             <div className={`${style.simple}`}>
-                <div className={`${style.rotate} ${this.state.isBook ? style.active : ""}`}
+                <div className={`${style.rotate} ${isClockIn ? style.active : ""}`}
                     onClick={() => {
-                        this.setState({
-                            isBook: !this.state.isBook
-                        })
+                        this.onBook(habit._id)
                     }}
                 >
                     <div className={`${style.front}`}>签到</div>
@@ -119,13 +192,13 @@ class book extends Component {
                 </div>
                 <div className={`${style.createRecord}`}
                     onClick={() => {
-                        this.state.isBook ? (
+                        isClockIn ? (
                             this.setState({
                                 bookWay: "record"
                             })
                         ) : ""
                     }}
-                ><span className={`${this.state.isBook ? style.active : ""}`}>记录一下<i className={`iconfont icon-post`} /></span></div>
+                ><span className={`${isClockIn ? style.active : ""}`}>记录一下<i className={`iconfont icon-post`} /></span></div>
             </div>
         )
         let record = (
@@ -133,6 +206,11 @@ class book extends Component {
                 <TextareaItem
                     rows={3}
                     count={140}
+                    onChange={(value) => {
+                        this.setState({
+                            text: value
+                        })
+                    }}
                 />
                 <div className={`${style.btn}`}>
                     {/* <span>签到</span> */}
@@ -140,14 +218,15 @@ class book extends Component {
                         type="primary"
                         className={`${style.qiandao}`}
                         activeClassName={`${style.active}`}
-                        onClick={(e)=>{ this.goBack() }}
-                        >发布</Button>
+                        onClick={(e) => { this.issue() }}
+                    >发布</Button>
                     <ImagePicker
                         files={this.state.files}
                         onChange={this.onChange}
                         onImageClick={(index, fs) => { this.openViewer(fs, index) }}
                         selectable={this.state.files.length < 1}
                         multiple={false}
+                        name='ImagePicker'
                     />
                     {this.state.isOpen ? <WxImageViewer
                         onClose={this.onClose}
@@ -165,52 +244,73 @@ class book extends Component {
     }
 
     render() {
+        let {
+            habitList
+        } = this.props.habit;
+        let {
+            id: bookHabitId
+        } = this.props.match.params;
+        let bookHabit = {}
+
+        if (habitList.habits && habitList.habits[0]) {
+            bookHabit = habitList.habits.find((item) => {
+                return item.habit._id === bookHabitId
+            })
+        }
+        if (!bookHabit) return (
+            <NavBar
+                mode="light"
+                leftContent={<Icon type="left" />}
+                onLeftClick={this.goBack}
+            >
+                {'请返回上一层'}
+            </NavBar>
+        );
+        let {
+            data,
+            habit,
+            isClockIn,
+        } = bookHabit;
+        let {
+            personalRecord,
+            isHaveDate
+        } = this.props.record;
+        let detail = '';
+
+        // 这个是可以运行的
+        if (personalRecord && personalRecord.length > 0) {
+            detail = personalRecord.map((item, index) => {
+                return (
+                    <Detail key={item._id} item={item} />
+                )
+            })
+        }
+        let loading = () => {
+            if (isHaveDate === '0') {
+                return (<div style={{ textAlign: 'center' }}>暂无图文</div>)
+            }
+            return (<div style={{ textAlign: 'center' }}><Icon type='loading' /></div>)
+        }
+
+
+
+
+
+
         return (
             <div>
                 <NavBar
                     mode="light"
                     leftContent={<Icon type="left" />}
-                    rightContent={
-                        <Popover
-                            mask
-                            overlayClassName="fortest"
-                            overlayStyle={{ color: 'currentColor' }}
-                            visible={this.state.visible}
-                            overlay={[
-                                (<Item key="1" value="del">退出该习惯</Item>)
-                            ]}
-                            align={{
-                                overflow: { adjustY: 0, adjustX: 0 },
-                                offset: [-10, 0],
-                            }}
-                            onVisibleChange={this.handleVisibleChange}
-                            onSelect={(opt, index) => { this.onSelect(opt, index) }}
-                        >
-                            <div style={{
-                                height: '100%',
-                                padding: '0 15px',
-                                marginRight: '-15px',
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                            >
-                                <Icon type="ellipsis" />
-                            </div>
-                        </Popover>
-
-                    }
                     onLeftClick={this.goBack}
                 >
-                    画画
-          </NavBar>
-
+                    {habit ? habit.habitName : ''}
+                </NavBar>
                 <div className={`${style.wrap}`}>
-                    {this.renderBook(this.state.bookWay)}
+                    {this.renderBook(this.state.bookWay, bookHabit)}
                 </div>
                 <div className={`${style.book_wrap}`}>
-                    <Detail />
-                    <Detail />
-                    <Detail />
+                    {detail ? detail : loading()}
                 </div>
             </div>
         )
@@ -219,9 +319,11 @@ class book extends Component {
 
 const mapStateToProps = (state) => {
     let {
-        userinfo
+        userinfo,
+        habit,
+        record
     } = state
-    return { userinfo };
+    return { userinfo, habit, record };
 }
 const mapDispatchToProps = (dispath) => {
     return {

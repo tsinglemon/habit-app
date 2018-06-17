@@ -7,6 +7,7 @@ export const STORE__CLEAR = "STORE__CLEAR";
 // 获取或者更新store
  export const STORE__USER_INFO = "STORE__USER_INFO";
  export const STORE__HABIT_DATA = "STORE__HABIT_DATA";
+ export const STORE__RECORD_DATA = "STORE__RECORD_DATA";
 
 
 // 检查用户名
@@ -27,9 +28,12 @@ export const ADD_HABIT = "ADD_HABIT";
 export const GET_HABIT = "GET_HABIT";
 // 删除习惯
 export const DEL_HABIT = "DEL_HABIT";
-
-
-
+// 签到
+export const BOOK_HABIT = "BOOK_HABIT";
+// 发布图文
+export const ISSUE_RECORD = "ISSUE_RECORD";
+// 获取图文
+export const GET_RECORD = "GET_RECORD";
 
 
 

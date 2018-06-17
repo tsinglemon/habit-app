@@ -199,24 +199,6 @@ router.get('/createHabit', (req, res) => {
     })
 })
 
-// populate的使用
-// router.get('/get', (req, res) => {
-//     let userId = req.query.userId;
-//     user_info.find({
-//         user: userId,
-//     }).
-//         populate({
-//             path: "habits.habit"
-//         }).
-//         populate({
-//             path: "user"
-//         }).
-//         exec((err, msg) => {
-//             res.json(msg)
-//         })
-// })
-
-
 // 添加个人习惯
 router.get('/addHabit', (req, res) => {
 
@@ -293,6 +275,13 @@ router.get('/delHabit', (req, res) => {
                         }
                     }
                 }, (err, msg) => {
+                    habit_record.remove({
+                        user: userId,
+                        habit: habitId
+                    }, (err, msg) => {
+                        // res.json(msg)
+                    })
+
                     habit_all.findOneAndUpdate({
                         _id: habitId
                     }, {
@@ -306,7 +295,7 @@ router.get('/delHabit', (req, res) => {
                                         habitId
                                     }
                                 ],
-                                isUpdate: true
+                                isDel: true
                             })
                         })
                 })
@@ -327,7 +316,7 @@ router.get('/clockIn', (req, res) => {
         if (msg[0].habits[0].isClockIn) {
             res.json({ msg: "已签到" })
         } else {
-            user_info.update({
+            user_info.findOneAndUpdate({
                 user: userId,
                 "habits": {
                     // `$elemMatch专门用于查询数组Field中元素是否满足指定的条件。
@@ -347,8 +336,25 @@ router.get('/clockIn', (req, res) => {
                     $push: {
                         "habits.$.date": Date.now()
                     }
-                }, (err, msg) => {
-                    res.json(msg)
+                }, {
+                    new: true
+                }).populate({
+                    path: "habits.habit"
+                }).exec((err, msg) => {
+                    // TODO 签到返回签到状态，返回到客户端进行合并，然后更新组件。
+
+                    let bookHabit = msg.habits.find((item) => {
+                        let itemHabit = JSON.stringify(item.habit._id);
+                        let _habitId = JSON.stringify(habitId);
+                        return itemHabit === _habitId
+                    })
+                    // 不知道为什么不能用habits会没法覆盖赋值，只能用其他名字（book）来代替
+                    res.json({
+                        isUpdate: true,
+                        habitList: {
+                            book: [bookHabit]
+                        }
+                    })
                 })
         }
     })
@@ -364,7 +370,7 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
     let urls = []
     req.files.map((item, index) => {
         let url = item.path.replace(/static\\/, "").replace("\\", "/");
-        return urls.push(url);
+        return urls.push(`http://localhost:3008/${url}`);
     })
 
     habit_record.create({
@@ -377,9 +383,23 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
         comment: [],
         commentCount: 0
     }, (err, msg) => {
-        res.json(msg)
+        habit_record.find({
+            user: userId,
+            habit: habitId
+        }).populate({
+            path: 'user'
+        }).populate({
+            path: 'habit'
+        }).sort({ '_id': -1 }).limit(1).exec((err, msg) => {
+            res.json({
+                type: 'issue',
+                key: 'personalRecord',
+                recordList: msg
+            })
+        })
     })
 })
+
 
 // 删除图文记录
 router.get('/delRecord', (req, res) => {
@@ -399,16 +419,36 @@ router.get('/delRecord', (req, res) => {
 router.get('/getRecord', (req, res) => {
 
     let userId = req.query.userId;
-    let recordId = req.query.recordId;
+    let habitId = req.query.habitId;
+    let page = req.query.page ? req.query.page : 1
     /**
      * 这里可以根据用户、习惯、日期来进行分别查询
      */
-    // habit_record.find({
-    //     user: userId,
-    //     _id: recordId
-    // }, (err, msg) => {
-    //     res.json(msg)
-    // })
+    // 找某个人的某个习惯的图文
+    habit_record.find({
+        user: userId,
+        habit: habitId
+    }).populate({
+        path: 'user'
+    }).populate({
+        path: 'habit'
+    }).sort({ '_id': -1 }).skip((page - 1) * 5).limit(3).exec((err, msg) => {
+        let isHaveDate = '';
+        if (msg.length > 0) {
+            isHaveDate = '1';
+        } else {
+            isHaveDate = '0'
+        }
+        res.json({
+            isHaveDate,
+            type: 'personalRecord',
+            key: 'personalRecord',
+            recordList: msg
+        })
+    })
+    // 找某个习惯的所有图文
+    // 找点赞数最多的图文
+
 })
 
 // 点赞
@@ -543,8 +583,8 @@ router.get('/delComment', (req, res) => {
 router.get('/init', (req, res) => {
 
     // let habitId = "5aedc78687cfad73641f347e";
-    let habitId = "5aedc7a087cfad73641f3480";
-    let userId = "5aede8a202f25993ec1902f2";
+    let habitId = "5b19de33a9dc32ee015925db";
+    let userId = "5b19dd56a9dc32ee015925d5";
 
     // 根据最后更新的时间判断是否需要重置该习惯的签到状态
     user_info.find({
@@ -558,12 +598,13 @@ router.get('/init', (req, res) => {
             month = now.getMonth(),
             date = now.getDate()
         let today = new Date(year, month, date)
-
         let dis = today.getTime() + 0 - lastDate.getTime() + 0;
+
         if (dis < 0) {
-            res.json("已重置签到状态")
+            // if (dis > 0) {
+            res.json("不需要重置")
         } else {
-            user_info.update({
+            user_info.findOneAndUpdate({
                 user: userId,
                 "habits": {
                     // `$elemMatch专门用于查询数组Field中元素是否满足指定的条件。
@@ -576,12 +617,14 @@ router.get('/init', (req, res) => {
                     $set: {
                         "habits.$.isClockIn": false
                     }
+                }, {
+                    new: true
                 }, (err, msg) => {
+
+
                     res.json(msg)
                 })
-            res.json("重置签到状态")
         }
-        res.json(msg[0].habits[0])
     })
 })
 

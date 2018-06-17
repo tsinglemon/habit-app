@@ -54,7 +54,6 @@ class habit extends Component {
         })
     }
     delHabit(item) {
-        console.log(item)
         let {
             async_delHabit
         } = this.props.actionMethod;
@@ -98,7 +97,6 @@ class habit extends Component {
                 </List.Item>
             )
         })
-        console.log(editHabits)
         return editHabits
     }
     myHabits() {
@@ -106,29 +104,27 @@ class habit extends Component {
             habitList
         } = this.props.habit;
 
-        if (!habitList||!habitList.habits) return;
-
+        if (!habitList || !habitList.habits) return;
         let showHabits = habitList.habits.map((item, index) => {
 
             return (
                 <List.Item
                     className="per-habit-item"
                     arrow=""
-                    thumb={<div className="iconfont icon-marketing_fill"></div>}
-                    // thumb={`http://192.168.1.105:3008` + item.habit.thum}
-                    // thumb={<img style={{width:"100%",height:"100%"}} src={`http://192.168.1.105:3008`+ item.habit.thum }/>}
+                    thumb={<div className='iconfont icon-marketing_fill'
+                        style={item.isClockIn?{color:'#39cc7b'}:{}}
+                    ></div>}
                     multipleLine
-                    // onClick={() => {  }}
+                    onClick={() => {
+                        this.forward(`/habit/book/${item.habit._id}`)
+                    }}
                     key={index}
                 >
-                    <Link to="/habit/book/0001">
-                        {<div className="per-habit-name">{item.habit.habitName}</div>}
-                        <List.Item.Brief className="per-habit-brief">已坚持{item.count}天</List.Item.Brief>
-                    </Link>
+                    {<div className="per-habit-name">{item.habit.habitName}</div>}
+                    <List.Item.Brief className="per-habit-brief">已坚持{item.count}天</List.Item.Brief>
                 </List.Item>
             )
         })
-        console.log(showHabits)
         return showHabits
 
     }
@@ -158,7 +154,6 @@ class habit extends Component {
                 <List className="per-habit-list">
                     {isEdit ? this.editHabit() : this.myHabits()}
                 </List>
-
             </div>
         )
     }

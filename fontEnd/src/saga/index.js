@@ -113,11 +113,77 @@ function* habit(action) {
                 let sagaData = yield call(axios.get, "/api/habit/delHabit", {
                     params: {
                         userId: action.data.userId,
-                        habitId:action.data.habitId
+                        habitId: action.data.habitId
                     }
                 })
                 console.log(sagaData)
                 yield put(actionMethod.store_habitData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        case actionType.BOOK_HABIT:
+            try {
+                let sagaData = yield call(axios.get, "/api/habit/clockIn", {
+                    params: {
+                        userId: action.data.userId,
+                        habitId: action.data.habitId
+                    }
+                })
+                console.log(sagaData)
+                yield put(actionMethod.store_habitData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+    }
+}
+// 图文
+function* record(action) {
+    switch (action.type) {
+        case actionType.ISSUE_RECORD:
+            try {
+
+                let {
+                    text,
+                    files,
+                    userId,
+                    habitId
+                } = action.data;
+
+                let formData = new FormData();
+                formData.append("userId", userId)
+                formData.append("habitId", habitId)
+                formData.append("text", text)
+                let images = files.map((item) => {
+                    return item.file
+                })
+                for (var i = 0; i < images.length; i++) {
+                    formData.append("recordImage", images[i])
+                }
+
+                let sagaData = yield call(axios.post, "/api/habit/record", formData)
+                console.log(sagaData)
+                yield put(actionMethod.store_recordData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        case actionType.GET_RECORD:
+            try {
+                let {
+                    userId,
+                    habitId
+                } = action.data;
+
+                let sagaData = yield call(axios.get, "/api/habit/getRecord", {
+                    params: {
+                        userId,
+                        habitId
+                    }
+                })
+                console.log(sagaData)
+                yield put(actionMethod.store_recordData(sagaData));
             } catch (e) {
                 console.log(e)
             }
@@ -144,6 +210,11 @@ export function* habitSaga() {
     yield takeLatest(actionType.GET_HABIT, habit)
     // 删除习惯
     yield takeLatest(actionType.DEL_HABIT, habit)
-
+    // 签到
+    yield takeLatest(actionType.BOOK_HABIT, habit)
+    // 发布图文
+    yield takeLatest(actionType.ISSUE_RECORD, record)
+    // 获取图文
+    yield takeLatest(actionType.GET_RECORD, record)
 }
 

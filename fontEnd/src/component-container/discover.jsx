@@ -16,7 +16,7 @@ class Discover extends Component {
 
         const tabs = [
             { title: <Badge text={''} overflowCount={20}>热门</Badge> },
-            { title: <Badge text={30} overflowCount={20}>关注</Badge> },
+            // { title: <Badge text={30} overflowCount={20}>关注</Badge> },
             { title: <Badge text={''} overflowCount={20}>最新</Badge> },
         ];
         return (

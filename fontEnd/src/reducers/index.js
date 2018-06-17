@@ -9,10 +9,12 @@ import {combineReducers} from 'redux';
 // 引入子规则
 import userinfo from './userinfo';
 import habit from './habit';
+import record from './record';
 // 合并子规则
 const rootReducer = combineReducers({
     userinfo,
-    habit
+    habit,
+    record
 });
 // 导出规则集合
 export default rootReducer;

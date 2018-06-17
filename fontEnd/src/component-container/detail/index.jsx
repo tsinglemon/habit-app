@@ -10,11 +10,16 @@ import Detail_footer from './detail_footer.jsx';
 
 export default class extends Component {
     render(){
+        let {
+            item
+        } = this.props;
+        if (!item) return (<div></div>)
+        
         return(
             <div className={`${style.detail_wrap}`}>
-                <Detail_head/>
-                <Detail_body/>
-                <Detail_footer/>
+                <Detail_head item={item} />
+                <Detail_body item={item}/>
+                <Detail_footer item={item}/>
             </div>
         )
     }

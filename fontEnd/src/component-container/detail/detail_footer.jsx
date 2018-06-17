@@ -70,13 +70,18 @@ export default class extends Component {
     }
 
     render() {
+        let {
+            item
+        } = this.props;
+        if (!item) return (<div></div>)
+        
         return (
             <div className={`${style.footer_wrap}`}>
 
-                <span className={`iconfont icon-like`}><em className={`${style.footer_item}`}>0</em></span>
+                <span className={`iconfont icon-like`}><em className={`${style.footer_item}`}>{item.praiseCount}</em></span>
                 <span className={`iconfont icon-xiaoxi`}
                     onClick={this.showModal('modal')}
-                ><em className={`${style.footer_item}`}>0</em></span>
+                ><em className={`${style.footer_item}`}>{item.commentCount}</em></span>
                 <span className={`iconfont icon-shanchu`}></span>
 
                 <Modal

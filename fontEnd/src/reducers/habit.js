@@ -6,9 +6,9 @@ import * as actionType from '../constants/index.js'
 let initHabitData = {
     searchResult: [],
     habitList: [],
-    isUpdate: false
+    isUpdate: false,
+    isDel: false,
 };
-let oldSerchResult = [];
 
 export default (state, action) => {
     if (typeof state === "undefined") {
@@ -22,54 +22,61 @@ export default (state, action) => {
             let {
                 searchResult = state.searchResult,
                 habitList = state.habitList,
-                isUpdate = state.isUpdate
+                isUpdate = state.isUpdate,
+                isDel = state.isDel
             } = newData.data;
             // 创建、加入后替换对应的状态
             if (isUpdate) {
-                console.log(searchResult)
-                searchResult = state.searchResult.map((item, index) => {
-                    let update = searchResult.find(
-                        (el) => {
-                            return el.habitName === item.habitName ||
-                                el.habitId === item.habitId
-                        });
-                    return update ? { ...item, ...update } : item
-                })
-
+                if (searchResult[0]) {
+                    searchResult = state.searchResult.map((item, index) => {
+                        let update = searchResult.find(
+                            (el) => {
+                                return el.habitName === item.habitName ||
+                                    el.habitId === item.habitId
+                            });
+                        return update ? { ...item, ...update } : item
+                    })
+                }
+                // 展示个人习惯列表
+                if (habitList && habitList.habits) {
+                    habitList.habits = state.habitList.habits.map((item, index) => {
+                        let update = habitList.habits.find(
+                            (el) => {
+                                return el.habitName === item.habit.habitName 
+                            });
+                        return update ? { ...item, ...update } : item
+                    })
+                }
+                // 展示签到状态
+                if (habitList&&habitList.book) {
+                    habitList.habits = state.habitList.habits.map((item, index) => {
+                        let update = habitList.book.find(
+                            (el) => {
+                                return el.habit._id === item.habit._id
+                            });
+                        return update ? { ...item, ...update  } : item
+                    })
+                }
+            }
+            // 删除习惯
+            if (isDel) {
                 if (habitList[0]) {
                     let removeIndex = state.habitList.habits.findIndex((item) => {
                         return item.habit._id === habitList[0].habitId
                     })
-                    console.log(removeIndex)
-
                     if (removeIndex !== -1) {
                         state.habitList.habits.splice(removeIndex, 1)
-
                         habitList = state.habitList;
                     }
                 }
-
-
-
-                state = {
-                    ...state,
-                    ...{
-                        searchResult,
-                        habitList,
-                        isUpdate
-                    }
-                }
-            } else {
-                state = {
-                    ...state,
-                    ...{
-                        searchResult,
-                        habitList,
-                        isUpdate
-                    }
+            }
+            state = {
+                ...state,
+                ...{
+                    searchResult,
+                    habitList
                 }
             }
-            console.log(state)
             return state
 
 
