@@ -33,12 +33,12 @@ class book extends Component {
         this.onSelect = this.onSelect.bind(this)
         this.goBack = this.goBack.bind(this);
         this.openViewer = this.openViewer.bind(this)
+        this.getRecord = this.getRecord.bind(this)
     }
     componentDidMount() {
         let {
             async_isLogin,
-            async_getHabit,
-            async_getRecord
+            async_getHabit
         } = this.props.actionMethod;
         let {
             habitList = []
@@ -58,23 +58,40 @@ class book extends Component {
                 userId
             })
         }
-        // 获取签到的习惯的图文
-        async_getRecord({
-            userId,
-            habitId
-        })
-
-
-
     }
     componentDidUpdate() {
         let {
             isLogin
         } = this.props.userinfo;
+        let {
+            tempRecord,
+            isHaveDate
+        } = this.props.record;
 
         if (!isLogin) {
             this.props.history.replace('/entry')
         }
+        // 当删除完已加载到本地的图文就再加载新的回来
+        // 注意：render函数里只能放纯函数，不能放this.getRecord这类非纯函数。
+        if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
+            this.getRecord()
+        }
+    }
+
+    // 获取某人的某个习惯的图文
+    getRecord() {
+        let {
+            async_getRecord
+        } = this.props.actionMethod;
+        let {
+            id: habitId
+        } = this.props.match.params;
+        let userId = window.localStorage.getItem("userId");
+
+        async_getRecord({
+            userId,
+            habitId
+        })
     }
     onChange = (files, type, index) => {
         console.log(files, type, index);
@@ -142,7 +159,7 @@ class book extends Component {
                 store_recordData({
                     data: {
                         type: '-',
-                        key: 'personalRecord',
+                        isHaveDate: '1',
                         recordList: []
                     }
                 })
@@ -170,7 +187,9 @@ class book extends Component {
         })
         this.state.bookWay === "record" ? (
             this.setState({
-                bookWay: "simple"
+                bookWay: "simple",
+                text:'',
+                files:[]
             })
         ) : '';
     }
@@ -272,14 +291,13 @@ class book extends Component {
             isClockIn,
         } = bookHabit;
         let {
-            personalRecord,
+            tempRecord,
             isHaveDate
         } = this.props.record;
         let detail = '';
 
-        // 这个是可以运行的
-        if (personalRecord && personalRecord.length > 0) {
-            detail = personalRecord.map((item, index) => {
+        if (tempRecord && tempRecord.length > 0) {
+            detail = tempRecord.map((item, index) => {
                 return (
                     <Detail key={item._id} item={item} />
                 )
@@ -288,14 +306,10 @@ class book extends Component {
         let loading = () => {
             if (isHaveDate === '0') {
                 return (<div style={{ textAlign: 'center' }}>暂无图文</div>)
+            } else {
+                return (<div style={{ textAlign: 'center' }}><Icon type='loading' /></div>)
             }
-            return (<div style={{ textAlign: 'center' }}><Icon type='loading' /></div>)
         }
-
-
-
-
-
 
         return (
             <div>

@@ -81,6 +81,13 @@ export const async_issueRecord = (data) => {
         data
     }
 }
+// 发布图文
+export const async_delRecord= (data) => {
+    return {
+        type: actionType.DEL_RECORD,
+        data
+    }
+}
 // 获取图文
 export const async_getRecord = (data) => {
     return {
@@ -88,6 +95,28 @@ export const async_getRecord = (data) => {
         data
     }
 }
+// 点赞
+export const async_praise = (data) => {
+    return {
+        type: actionType.PRAISE,
+        data
+    }
+}
+// 评论
+export const async_comment = (data) => {
+    return {
+        type: actionType.COMMENT,
+        data
+    }
+}
+// 删除评论
+export const async_delComment = (data) => {
+    return {
+        type: actionType.DEL_COMMENT,
+        data
+    }
+}
+
 
 
 

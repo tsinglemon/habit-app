@@ -32,8 +32,16 @@ export const DEL_HABIT = "DEL_HABIT";
 export const BOOK_HABIT = "BOOK_HABIT";
 // 发布图文
 export const ISSUE_RECORD = "ISSUE_RECORD";
+// 删除图文
+export const DEL_RECORD = "DEL_RECORD";
 // 获取图文
 export const GET_RECORD = "GET_RECORD";
+// 点赞
+export const PRAISE = "PRAISE";
+// 评论
+export const COMMENT = "COMMENT";
+// 删除评论
+export const DEL_COMMENT = "DEL_COMMENT";
 
 
 

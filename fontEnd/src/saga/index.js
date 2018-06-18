@@ -110,11 +110,9 @@ function* habit(action) {
             break;
         case actionType.DEL_HABIT:
             try {
-                let sagaData = yield call(axios.get, "/api/habit/delHabit", {
-                    params: {
-                        userId: action.data.userId,
-                        habitId: action.data.habitId
-                    }
+                let sagaData = yield call(axios.post, "/api/habit/delHabit", {
+                    userId: action.data.userId,
+                    habitId: action.data.habitId
                 })
                 console.log(sagaData)
                 yield put(actionMethod.store_habitData(sagaData));
@@ -141,6 +139,7 @@ function* habit(action) {
 // 图文
 function* record(action) {
     switch (action.type) {
+        // 发布
         case actionType.ISSUE_RECORD:
             try {
 
@@ -169,6 +168,24 @@ function* record(action) {
                 console.log(e)
             }
             break;
+        // 删除
+        case actionType.DEL_RECORD:
+            try {
+                let {
+                    userId,
+                    recordId
+                } = action.data;
+                let sagaData = yield call(axios.post, "/api/habit/delRecord", {
+                    userId,
+                    recordId
+                })
+                console.log(sagaData)
+                yield put(actionMethod.store_recordData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        // 获取
         case actionType.GET_RECORD:
             try {
                 let {
@@ -181,6 +198,72 @@ function* record(action) {
                         userId,
                         habitId
                     }
+                })
+                console.log(sagaData)
+                yield put(actionMethod.store_recordData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        // 点赞
+        case actionType.PRAISE:
+            try {
+                let {
+                    userId,
+                    recordId
+                } = action.data;
+
+                let sagaData = yield call(axios.get, "/api/habit/like", {
+                    params: {
+                        userId,
+                        recordId
+                    }
+                })
+                console.log(sagaData)
+                // return;
+                yield put(actionMethod.store_recordData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        // 评论
+        case actionType.COMMENT:
+            try {
+                let {
+                    userId,
+                    otherUserId,
+                    otherUserComment,
+                    recordId,
+                    content
+                } = action.data;
+
+                let sagaData = yield call(axios.post, "/api/habit/comment", {
+                    userId,
+                    otherUserId,
+                    otherUserComment,
+                    recordId,
+                    content
+                })
+                console.log(sagaData)
+                // return;
+                yield put(actionMethod.store_recordData(sagaData));
+            } catch (e) {
+                console.log(e)
+            }
+            break;
+        // 删除评论
+        case actionType.DEL_COMMENT:
+            try {
+                let {
+                    userId,
+                    recordId,
+                    commentId,
+                } = action.data;
+
+                let sagaData = yield call(axios.post, "/api/habit/delComment", {
+                    userId,
+                    recordId,
+                    commentId
                 })
                 console.log(sagaData)
                 yield put(actionMethod.store_recordData(sagaData));
@@ -203,9 +286,9 @@ export function* habitSaga() {
     // 搜索习惯
     yield takeLatest(actionType.SEARCH, habit)
     // 创建习惯
-    yield takeLatest(actionType.CREATE_HABIT, habit)
+    yield takeEvery(actionType.CREATE_HABIT, habit)
     // 添加习惯
-    yield takeLatest(actionType.ADD_HABIT, habit)
+    yield takeEvery(actionType.ADD_HABIT, habit)
     // 获取习惯
     yield takeLatest(actionType.GET_HABIT, habit)
     // 删除习惯
@@ -214,7 +297,15 @@ export function* habitSaga() {
     yield takeLatest(actionType.BOOK_HABIT, habit)
     // 发布图文
     yield takeLatest(actionType.ISSUE_RECORD, record)
+    // 删除图文
+    yield takeEvery(actionType.DEL_RECORD, record)
     // 获取图文
     yield takeLatest(actionType.GET_RECORD, record)
+    // 点赞
+    yield takeEvery(actionType.PRAISE, record)
+    // 评论
+    yield takeEvery(actionType.COMMENT, record)
+    // 删除评论
+    yield takeEvery(actionType.DEL_COMMENT, record)
 }
 

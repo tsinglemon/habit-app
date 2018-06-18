@@ -251,10 +251,10 @@ router.get('/addHabit', (req, res) => {
     })
 })
 // 删除个人的习惯
-router.get('/delHabit', (req, res) => {
+router.post('/delHabit', (req, res) => {
 
-    let habitId = req.query.habitId;
-    let userId = req.query.userId;
+    let habitId = req.body.habitId;
+    let userId = req.body.userId;
 
     user_info.findOne({
         user: userId,
@@ -393,7 +393,6 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
         }).sort({ '_id': -1 }).limit(1).exec((err, msg) => {
             res.json({
                 type: 'issue',
-                key: 'personalRecord',
                 recordList: msg
             })
         })
@@ -402,16 +401,23 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
 
 
 // 删除图文记录
-router.get('/delRecord', (req, res) => {
+router.post('/delRecord', (req, res) => {
 
-    let userId = req.query.userId;
-    let recordId = req.query.recordId;
+    let userId = req.body.userId;
+    let recordId = req.body.recordId;
 
     habit_record.remove({
         user: userId,
         _id: recordId
     }, (err, msg) => {
-        res.json(msg)
+        msg.n === 1 ?
+            res.json({
+                type: 'del',
+                recordList: [{
+                    _id: recordId
+                }]
+            }) :
+            res.json(msg)
     })
 })
 
@@ -432,6 +438,8 @@ router.get('/getRecord', (req, res) => {
         path: 'user'
     }).populate({
         path: 'habit'
+    }).populate({
+        path: 'comment.user'
     }).sort({ '_id': -1 }).skip((page - 1) * 5).limit(3).exec((err, msg) => {
         let isHaveDate = '';
         if (msg.length > 0) {
@@ -439,11 +447,19 @@ router.get('/getRecord', (req, res) => {
         } else {
             isHaveDate = '0'
         }
+        // 最新的评论在最上面，最早的评论在下面
+        let margeComment = msg.map((item) => {
+            if (item.comment[0]) {
+                item.comment.sort((n1, n2) => {
+                    return n2.time - n1.time
+                })
+            }
+            return item
+        })
         res.json({
             isHaveDate,
-            type: 'personalRecord',
-            key: 'personalRecord',
-            recordList: msg
+            type: 'list',
+            recordList: margeComment
         })
     })
     // 找某个习惯的所有图文
@@ -461,8 +477,7 @@ router.get('/like', (req, res) => {
         praise: userId
     }, (err, msg) => {
         if (msg) {
-            console.log(recordId)
-            habit_record.update({ _id: recordId },
+            habit_record.findOneAndUpdate({ _id: recordId },
                 {
                     $pull: {
                         praise: userId
@@ -470,18 +485,24 @@ router.get('/like', (req, res) => {
                     $inc: {
                         praiseCount: -1
                     }
+                }, {
+                    new: true
                 }, (err, msg) => {
                     // 取消用户点赞过的图文
                     user_info.update({ user: userId }, {
                         $pull: {
                             collect: recordId
                         }
-                    }, (err, msg) => {
-                        res.json("按理应该删了")
+                    }, (err) => {
+                        err ? res.json(err) :
+                            res.json({
+                                type: 'update',
+                                recordList: [msg]
+                            })
                     })
                 })
         } else {
-            habit_record.update({ _id: recordId },
+            habit_record.findOneAndUpdate({ _id: recordId },
                 {
                     $push: {
                         praise: [userId]
@@ -489,30 +510,39 @@ router.get('/like', (req, res) => {
                     $inc: {
                         praiseCount: +1
                     }
+                }, {
+                    new: true
                 }, (err, msg) => {
                     // 记录用户点赞过的图文
                     user_info.update({ user: userId }, {
                         $push: {
                             collect: [recordId]
                         }
-                    }, (err, msg) => {
-                        res.json("按理应该赞了")
-                    })
+                    }, (err) => {
+                        err ? res.json(err) :
+                            res.json({
+                                type: 'update',
+                                recordList: [msg]
+                            })
+                    });
+
                 })
         }
     })
 })
 
 // 评论/回复
-router.get('/comment', (req, res) => {
-    let userId = req.query.userId;
-    let otherUserId = req.query.otherUserId;
-    let recordId = req.query.recordId;
-    let content = req.query.content;
+router.post('/comment', (req, res) => {
+    let userId = req.body.userId;
+    let otherUserId = req.body.otherUserId;
+    let recordId = req.body.recordId;
+    let content = req.body.content;
+    let otherUserComment = req.body.otherUserComment;
+
 
     if (!otherUserId) {
         // 评论
-        habit_record.update({ _id: recordId }, {
+        habit_record.findOneAndUpdate({ _id: recordId }, {
             $push: {
                 comment: [{
                     user: userId,
@@ -521,50 +551,68 @@ router.get('/comment', (req, res) => {
             },
             $inc: {
                 commentCount: +1
+            },
+            $set: {
+                "time": new Date()
+            },
+        }, { new: true }).populate({
+            path: 'comment.user'
+        }).populate({
+            path: 'user'
+        }).exec((err, msg) => {
+
+            // 最新的评论在最上面，最早的评论在下面
+            if (msg.comment[0]) {
+                msg.comment.sort((n1, n2) => {
+                    return n2.time - n1.time
+                })
             }
-        }, (err, msg) => {
-            res.json(msg)
+            res.json({
+                type: 'update',
+                recordList: [msg]
+            })
         })
     } else {
         // 回复
-        habit_record.update({ _id: recordId }, {
+        habit_record.findOneAndUpdate({ _id: recordId }, {
             $push: {
                 comment: [{
-                    otherUser: otherUserId,
+                    otherUserComment,
                     user: userId,
-                    content,
+                    content
                 }]
             },
             $inc: {
                 commentCount: +1
             }
-        }, (err, msg) => {
-            res.json(msg)
+        }, { new: true }).populate({
+            path: 'comment.user'
+        }).populate({
+            path: 'user'
+        }).exec((err, msg) => {
+            // 最新的评论在最上面，最早的评论在下面
+            if (msg.comment[0]) {
+                msg.comment.sort((n1, n2) => {
+                    return n2.time - n1.time
+                })
+            }
+            res.json({
+                type: 'update',
+                recordList: [msg]
+            })
         })
     }
 })
 
 // 删除评论/回复
-router.get('/delComment', (req, res) => {
-    let userId = req.query.userId;
-    let recordId = req.query.recordId;
-    let commentId = req.query.commentId;
-
-    habit_record.update({
-        _id: recordId,
-        // comment: {
-        //     // 匹配数组中的哪一条，
-        //     $elemMatch: {
-        //         user: userId
-        //     }
-        // }
+router.post('/delComment', (req, res) => {
+    let userId = req.body.userId;
+    let recordId = req.body.recordId;
+    let commentId = req.body.commentId;
+    
+    habit_record.findOneAndUpdate({
+        _id: recordId
     }, {
-            // $set: {
-            //     // 匹配那一条要修改的属性
-            //     "comment.$.content": "llllllll"
-            // }
-
-            // 删除某条评论/回复
             $pull: {
                 "comment": {
                     _id: commentId,
@@ -574,8 +622,21 @@ router.get('/delComment', (req, res) => {
             $inc: {
                 commentCount: -1
             }
-        }, (err, msg) => {
-            res.json(msg)
+        }, { new: true }).populate({
+            path: 'comment.user'
+        }).populate({
+            path: 'user'
+        }).exec((err, msg) => {
+            // 最新的评论在最上面，最早的评论在下面
+            if (msg.comment[0]) {
+                msg.comment.sort((n1, n2) => {
+                    return n2.time - n1.time
+                })
+            }
+            res.json({
+                type: 'update',
+                recordList: [msg]
+            })
         })
 })
 

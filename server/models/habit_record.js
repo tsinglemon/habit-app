@@ -29,15 +29,20 @@ const option = {
     }],
     praiseCount: Number,
     comment: [{
-        otherUser:{
-            type: Schema.Types.ObjectId,
-            ref: "user_security"
-        },
+        // otherUser: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: "user_security"
+        // },
+        otherUserComment: {},
         user: {
             type: Schema.Types.ObjectId,
             ref: "user_security"
         },
-        content: String
+        content: String,
+        time: {
+            type: Date,
+            default: Date.now
+        }
     }],
     commentCount: Number
 }

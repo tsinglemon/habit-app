@@ -162,6 +162,10 @@ body .am-popover-mask {
     height: 0;
     overflow: hidden;
 }
+/* 点赞按钮 */
+.iconfont.icon-likefill{
+    color:#39cc7b
+}
 
 
 /* 我的收藏 */

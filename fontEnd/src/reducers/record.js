@@ -5,8 +5,8 @@ import * as actionType from '../constants/index.js'
 // 合并并初始化初始值。
 let initRecordData = {
     // 看别人的和看自己的图文
-    isHaveDate:'',
-    personalRecord: []
+    isHaveDate: '1',
+    tempRecord: []
     // 看发现那里的。。。
 };
 
@@ -30,24 +30,73 @@ export default (state, action) => {
                 state = {
                     ...state,
                     ...{
-                        [key]: [...recordList, ...state[key]]
+                        tempRecord: [...recordList, ...state.tempRecord]
                     }
                 }
                 console.log(state)
-            } else {
-                // 如果是上下拉刷新就在这里合并数组，最后再大合并
-                // ...
-
+            } else if (type === 'update') {
+                let updateRecordList = state.tempRecord.map((item) => {
+                    let matchId = item._id === recordList[0]._id
+                    return matchId ? {
+                        ...item,
+                        praiseCount: recordList[0].praiseCount,
+                        praise: recordList[0].praise,
+                        comment: [...recordList[0].comment],
+                        commentCount: recordList[0].commentCount
+                    } : item;
+                })
                 state = {
                     ...state,
                     ...{
-                        [key]: recordList,
+                        tempRecord: updateRecordList
+                    }
+                }
+            } else if (type === 'del') {
+                let delIndex = state.tempRecord.findIndex((item) => {
+                    return item._id === recordList[0]._id
+                })
+
+                state.tempRecord.splice(delIndex, 1)
+                state = {
+                    ...state
+                }
+            } else if (type === 'list') {
+                console.log(recordList)
+                state = {
+                    ...state,
+                    ...{
+                        tempRecord: recordList,
                         isHaveDate
                     }
                 }
-                console.log(state)
+            } else {
+                state = {
+                    ...state,
+                    ...{
+                        isHaveDate,
+                        tempRecord: recordList
+                    }
+                }
             }
+
             return state
+        // if (type === 'issue') {
+
+        // } else if (type === 'update') {
+
+        // } else {
+        //     // 如果是上下拉刷新就在这里合并数组，最后再大合并
+        //     // ...
+
+        //     state = {
+        //         ...state,
+        //         ...{
+        //             tempRecord: recordList,
+        //             isHaveDate
+        //         }
+        //     }
+        //     console.log(state)
+        // }
 
 
 
