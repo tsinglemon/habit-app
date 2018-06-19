@@ -61,9 +61,15 @@ class book extends Component {
             })
         }
         const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
+
+        // 为什么加定时器？为了在卸载页面的时候跳过这个方法，不然会有以下报错信息（提示你不要在组件卸载的时候调用方法）
+        /* 
+            Warning: Can't call setState (or forceUpdate) on an unmounted component. 
+            This is a no-op, but it indicates a memory leak in your application. 
+            To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+        */
         setTimeout(() => this.setState({
-            height: hei,
-            // data: genData(),
+            height: hei
         }), 0);
     }
     componentDidUpdate() {
@@ -83,7 +89,21 @@ class book extends Component {
         if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
             this.getRecord()
         }
+    }
 
+    componentWillUnmount() {
+        let {
+            store_recordData
+        } = this.props.actionMethod;
+        setTimeout(() => {
+            store_recordData({
+                data: {
+                    type: '-',
+                    isHaveDate: '1',
+                    recordList: []
+                }
+            })
+        }, 0)
     }
 
     // 获取某人的某个习惯的图文
@@ -98,9 +118,7 @@ class book extends Component {
             tempRecord
         } = this.props.record;
         let userId = window.localStorage.getItem("userId");
-
         let lastRecord = tempRecord.length > 0 ? tempRecord[tempRecord.length - 1]._id : ''
-        console.log(lastRecord)
 
         async_getRecord({
             userId,
@@ -170,15 +188,15 @@ class book extends Component {
             // 目前的办法只是为了在返回的时候闪屏，故意延迟200毫秒
 
             this.props.history.goBack()
-            setTimeout(() => {
-                store_recordData({
-                    data: {
-                        type: '-',
-                        isHaveDate: '1',
-                        recordList: []
-                    }
-                })
-            }, 200)
+            // setTimeout(() => {
+            //     store_recordData({
+            //         data: {
+            //             type: '-',
+            //             isHaveDate: '1',
+            //             recordList: []
+            //         }
+            //     })
+            // }, 200)
         }
     }
     issue(val) {

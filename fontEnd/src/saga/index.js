@@ -233,7 +233,7 @@ function* record(action) {
             try {
                 let {
                     userId,
-                    otherUserId,
+                    // otherUserId,
                     otherUserComment,
                     recordId,
                     content
@@ -241,7 +241,7 @@ function* record(action) {
 
                 let sagaData = yield call(axios.post, "/api/habit/comment", {
                     userId,
-                    otherUserId,
+                    // otherUserId,
                     otherUserComment,
                     recordId,
                     content

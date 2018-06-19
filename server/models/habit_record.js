@@ -29,10 +29,6 @@ const option = {
     }],
     praiseCount: Number,
     comment: [{
-        // otherUser: {
-        //     type: Schema.Types.ObjectId,
-        //     ref: "user_security"
-        // },
         otherUserComment: {},
         user: {
             type: Schema.Types.ObjectId,

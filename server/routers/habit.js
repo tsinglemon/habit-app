@@ -429,18 +429,26 @@ router.get('/getRecord', (req, res) => {
     let habitId = req.query.habitId;
     // 用客户端最后一条ID作为下一条的开始
     let lastRecord = req.query.lastRecord;
-
+    // 让该ObjectId成为当前全局最新最大的，然后返回没它大的ObjectId对应的数据到客户端
+    let id = mongoose.Types.ObjectId();
     /**
      * 这里可以根据用户、习惯、日期来进行分别查询
      */
     // 找某个人的某个习惯的图文
-    let id = mongoose.Types.ObjectId();
-    console.log(JSON.stringify(id))
-    habit_record.find({
+    let userRecord = {
         user: userId,
         habit: habitId,
-        _id: { '$lt': lastRecord?lastRecord:id }
-    }).populate({
+        _id: { '$lt': lastRecord ? lastRecord : id }
+    }
+    let allRecord = {
+        habit: habitId,
+        _id: { '$lt': lastRecord ? lastRecord : id }
+    }
+    let findObj = {}
+    findObj = userId && habitId ? userRecord :
+        habitId ? allRecord : {};
+
+    habit_record.find(findObj).populate({
         path: 'user'
     }).populate({
         path: 'habit'
@@ -464,7 +472,7 @@ router.get('/getRecord', (req, res) => {
         })
         res.json({
             isHaveDate,
-            type: lastRecord?'up':'list',
+            type: lastRecord ? 'up' : 'list',
             recordList: margeComment
         })
     })
@@ -540,74 +548,41 @@ router.get('/like', (req, res) => {
 // 评论/回复
 router.post('/comment', (req, res) => {
     let userId = req.body.userId;
-    let otherUserId = req.body.otherUserId;
     let recordId = req.body.recordId;
     let content = req.body.content;
     let otherUserComment = req.body.otherUserComment;
+    console.log(otherUserComment)
+    habit_record.findOneAndUpdate({ _id: recordId }, {
+        $push: {
+            comment: [{
+                otherUserComment,
+                user: userId,
+                content,
+            }]
+        },
+        $inc: {
+            commentCount: +1
+        },
+        $set: {
+            "time": new Date()
+        },
+    }, { new: true }).populate({
+        path: 'comment.user'
+    }).populate({
+        path: 'user'
+    }).exec((err, msg) => {
 
-
-    if (!otherUserId) {
-        // 评论
-        habit_record.findOneAndUpdate({ _id: recordId }, {
-            $push: {
-                comment: [{
-                    user: userId,
-                    content,
-                }]
-            },
-            $inc: {
-                commentCount: +1
-            },
-            $set: {
-                "time": new Date()
-            },
-        }, { new: true }).populate({
-            path: 'comment.user'
-        }).populate({
-            path: 'user'
-        }).exec((err, msg) => {
-
-            // 最新的评论在最上面，最早的评论在下面
-            if (msg.comment[0]) {
-                msg.comment.sort((n1, n2) => {
-                    return n2.time - n1.time
-                })
-            }
-            res.json({
-                type: 'update',
-                recordList: [msg]
+        // 最新的评论在最上面，最早的评论在下面
+        if (msg.comment[0]) {
+            msg.comment.sort((n1, n2) => {
+                return n2.time - n1.time
             })
+        }
+        res.json({
+            type: 'update',
+            recordList: [msg]
         })
-    } else {
-        // 回复
-        habit_record.findOneAndUpdate({ _id: recordId }, {
-            $push: {
-                comment: [{
-                    otherUserComment,
-                    user: userId,
-                    content
-                }]
-            },
-            $inc: {
-                commentCount: +1
-            }
-        }, { new: true }).populate({
-            path: 'comment.user'
-        }).populate({
-            path: 'user'
-        }).exec((err, msg) => {
-            // 最新的评论在最上面，最早的评论在下面
-            if (msg.comment[0]) {
-                msg.comment.sort((n1, n2) => {
-                    return n2.time - n1.time
-                })
-            }
-            res.json({
-                type: 'update',
-                recordList: [msg]
-            })
-        })
-    }
+    })
 })
 
 // 删除评论/回复

@@ -70,6 +70,7 @@ export default (state, action) => {
                     }
                 }
             } else if (type === 'up') {
+                // 上拉加载
                 console.log(recordList)
                 state = {
                     ...state,

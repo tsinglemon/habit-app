@@ -33,7 +33,7 @@ export default class extends Component {
                     </Link>
                     <div className={`${style.head_description}`}>
                         <h3 className={`${style.head_userName}`}> <Link to="/discover/">{item.user.userName}</Link> </h3>
-                        <span className={`${style.head_habit}`}>坚持<Link className={`${style.head_habitLink}`} to="/record/0002">#{item.habit.habitName}#</Link></span>
+                        <span className={`${style.head_habit}`}>坚持<Link className={`${style.head_habitLink}`} to={`/record/${item.habit._id}/`}>#{item.habit.habitName}#</Link></span>
                     </div>
                 </div>
                 <div className={`${style.head_date}`}>

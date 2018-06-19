@@ -44,7 +44,10 @@ export default connect(
             super(props)
             this.state = {
                 modal: false,
+                otherUserComment: null,
             }
+        }
+        componentDidMount() {
         }
         showModal = key => (e) => {
             // 修复 Android 上点击穿透
@@ -69,8 +72,9 @@ export default connect(
             }
         }
 
-        // 评论otherUser, commentId
+        // 评论
         sendValue(comment) {
+            console.log(comment)
             let {
                 async_comment,
                 async_delComment
@@ -78,25 +82,26 @@ export default connect(
             let {
                 item
             } = this.props;
-
+            let {
+                otherUserComment
+            } = this.state;
             let userId = window.localStorage.getItem('userId');
-            let otherUserId = comment&&comment.user?comment.user._id:'';
-            let otherUserComment = comment?comment:'';
-            
             let recordId = item._id;
-            let content = this.autoFocusInst.inputRef.props.value;
+            let inputValue = this.autoFocusInst.inputRef.props.value.trim()
+            if (inputValue === '') {
+                return;
+            }
 
             if (comment === undefined) {
                 async_comment({
                     userId,
-                    otherUserId,
                     otherUserComment,
                     recordId,
-                    content
+                    content: inputValue
                 })
                 this.autoFocusInst.clearInput();
-            } else if (userId ===comment.user._id) {
-                // 如果otherUser是自己就删除；
+            } else if (userId === comment.user._id) {
+                // 如果是自己的评论就提示删除；
                 Modal.operation([
                     {
                         text: `删除该评论？`,
@@ -104,12 +109,25 @@ export default connect(
                             async_delComment({
                                 userId,
                                 recordId,
-                                commentId:comment._id
+                                commentId: comment._id
                             })
                         }
                     }
                 ])
+            } else {
+                this.setState({
+                    otherUserComment: comment,
+                })
+                this.autoFocusInst.focus();
             }
+        }
+        onBlur() {
+            // 防止在点击发送时的失焦导致清空 @信息
+            setTimeout(() => {
+                this.setState({
+                    otherUserComment: null,
+                })
+            }, 200)
         }
 
 
@@ -145,18 +163,27 @@ export default connect(
 
         render() {
             let {
-                item
+                item: itemRecord
             } = this.props;
+            let {
+                otherUserComment
+            } = this.state;
             let userId = window.localStorage.getItem("userId");
-            if (!item) return (<div></div>)
+            if (!itemRecord) return (<div></div>)
 
-            let isMyPraise = item.praise.find((item) => {
+            let isMyPraise = itemRecord.praise.find((item) => {
                 return item === userId;
             })
-            let isAuthor = item.comment.find((comment) => {
-                return comment.user._id === item.user._id;
-            })
-            let comments = item.comment.map((item) => {
+            let isSelf = itemRecord.user && itemRecord.user._id === userId;
+
+            let placeholder = '';
+            if (otherUserComment) {
+                placeholder = `回复@${otherUserComment.user.userName}`;
+            } else if (itemRecord.user) {
+                placeholder = `神一般的评论~`;
+            }
+
+            let comments = itemRecord.comment.map((item) => {
                 let time = '刚刚';
                 let origin_ms = new Date(item.time).getTime();
                 let now_ms = new Date().getTime();
@@ -166,6 +193,8 @@ export default connect(
                 if (dis_ms >= 3600000 && dis_ms < 86400000) time = `${parseInt(dis_ms / 1000 / 60 / 60)}小时前`;
                 if (dis_ms >= 60000 && dis_ms < 3600000) time = `${parseInt(dis_ms / 1000 / 60)}分钟前`;
                 if (dis_ms >= 30000 && dis_ms < 60000) time = `${parseInt(dis_ms / 1000)}秒前`;
+
+                let isAuthor = item.user._id === itemRecord.user._id
 
                 return (
                     <div className={`${style.comment_item}`}
@@ -181,9 +210,11 @@ export default connect(
                         >
                             <h3 className={`${style.comment_user}`}>
                                 <span className={`${style.comment_userName}`}>{item.user.userName}
-                                    <span
-                                        style={{ padding: '0 4px', marginLeft: '4px', color: '#fff', background: '#f40', fontSize: '12px', lineHeight: 1 }}
-                                    >{isAuthor ? '作者' : ''}</span>
+                                    {isAuthor ? (
+                                        <span
+                                            style={{ padding: '0 4px', marginLeft: '4px', color: '#fff', background: '#f40', fontSize: '12px', lineHeight: 1 }}
+                                        >作者</span>
+                                    ) : ''}
                                 </span>
                                 <span className={`${style.comment_time}`}>{time}</span>
                             </h3>
@@ -200,40 +231,35 @@ export default connect(
                                             <div className={`${style.comment_info}`}> {item.otherUserComment.content}</div>
                                         </div>
                                     ) : ''
-
                                 }
-
                             </div>
                         </div>
                     </div>
                 )
             })
 
-
             return (
                 <div className={`${style.footer_wrap}`}>
-
                     <span className={!!isMyPraise ? `iconfont icon-likefill` : `iconfont icon-like`}
                         onClick={() => {
                             this.onPraise()
                         }}
-                    ><em className={`${style.footer_item}`}>{item.praiseCount}</em></span>
+                    ><em className={`${style.footer_item}`}>{itemRecord.praiseCount}</em></span>
                     <span className={`iconfont icon-xiaoxi`}
                         onClick={this.showModal('modal')}
-                    ><em className={`${style.footer_item}`}>{item.commentCount}</em></span>
-                    <span className={`iconfont icon-shanchu`}
-                        onClick={() => {
-
-                            Modal.operation([
-                                {
-                                    text: `确定删除？`,
-                                    onPress: () => this.delRecord()
-                                }
-                            ])
-
-                        }}
-                    ></span>
-
+                    ><em className={`${style.footer_item}`}>{itemRecord.commentCount}</em></span>
+                    {isSelf ? (
+                        <span className={`iconfont icon-shanchu`}
+                            onClick={() => {
+                                Modal.operation([
+                                    {
+                                        text: `确定删除？`,
+                                        onPress: () => this.delRecord()
+                                    }
+                                ])
+                            }}
+                        ></span>
+                    ) : ''}
                     <Modal
                         visible={this.state.modal}
                         transparent
@@ -254,9 +280,16 @@ export default connect(
                                 <div className="comment_input">
                                     <InputItem
                                         ref={ref => this.autoFocusInst = ref}
+                                        placeholder={placeholder}
+                                        onBlur={(e) => {
+                                            // 失焦取消回复@某人
+                                            this.onBlur()
+                                        }}
                                     >
                                         <span className="comment_btn" onClick={
-                                            () => { this.sendValue() }
+                                            () => {
+                                                this.sendValue()
+                                            }
                                         }>GO</span>
                                     </InputItem>
                                 </div>)
@@ -266,48 +299,6 @@ export default connect(
                     >
                         <div className={`${style.comment_list}`}>
                             {comments}
-                            {/* <div className={`${style.comment_item}`}>
-                                <div className={`${style.comment_pic}`}>
-                                    <Link to=''>
-                                        <img src="http://192.168.1.105:3008/images/default_head.jpg" />
-                                    </Link>
-                                </div>
-                                <div className={`${style.comment_body}`}>
-                                    <h3 className={`${style.comment_user}`}>
-                                        <span className={`${style.comment_userName}`}>{Canvas}</span>
-                                        <span className={`${style.comment_time}`}>21:20</span>
-                                    </h3>
-                                    <p className={`${style.comment_info}`}>
-                                        {}
-                                    </p>
-                                </div>
-                            </div> */}
-                            {/* <div className={`${style.comment_item}`}>
-                                <div className={`${style.comment_pic}`}>
-                                    <Link to=''>
-                                        <img src="http://192.168.1.105:3008/images/default_head.jpg" />
-                                    </Link>
-                                </div>
-                                <div className={`${style.comment_body}`}>
-                                    <h3 className={`${style.comment_user}`}>
-                                        <span className={`${style.comment_userName}`}>Canvas</span>
-                                        <span className={`${style.comment_time}`}>21:20</span>
-                                    </h3>
-                                    <p className={`${style.comment_info}`}>
-                                        评论的实际内容评论的实际内容容评论的实际内容评论的实际内容
-                                    </p>
-
-                                    <div className={`${style.comment_body}`}>
-                                        <h3 className={`${style.comment_user}`}>
-                                            <span className={`${style.comment_userName}`}>@Canvas</span>
-
-                                        </h3>
-                                        <p className={`${style.comment_info}`}>
-                                            评论的实际内容评论的实际内容容评论的实际内容评论的实际内容
-                                    </p>
-                                    </div>
-                                </div>
-                            </div> */}
                         </div>
                     </Modal>
                 </div>
