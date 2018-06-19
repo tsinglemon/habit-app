@@ -190,13 +190,15 @@ function* record(action) {
             try {
                 let {
                     userId,
-                    habitId
+                    habitId,
+                    lastRecord
                 } = action.data;
 
                 let sagaData = yield call(axios.get, "/api/habit/getRecord", {
                     params: {
                         userId,
-                        habitId
+                        habitId,
+                        lastRecord
                     }
                 })
                 console.log(sagaData)

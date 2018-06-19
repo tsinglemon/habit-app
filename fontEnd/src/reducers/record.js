@@ -61,12 +61,20 @@ export default (state, action) => {
                     ...state
                 }
             } else if (type === 'list') {
-                console.log(recordList)
+                // 刷新
                 state = {
                     ...state,
                     ...{
                         tempRecord: recordList,
                         isHaveDate
+                    }
+                }
+            } else if (type === 'up') {
+                console.log(recordList)
+                state = {
+                    ...state,
+                    ...{
+                        tempRecord: [...state.tempRecord, ...recordList]
                     }
                 }
             } else {
@@ -80,27 +88,6 @@ export default (state, action) => {
             }
 
             return state
-        // if (type === 'issue') {
-
-        // } else if (type === 'update') {
-
-        // } else {
-        //     // 如果是上下拉刷新就在这里合并数组，最后再大合并
-        //     // ...
-
-        //     state = {
-        //         ...state,
-        //         ...{
-        //             tempRecord: recordList,
-        //             isHaveDate
-        //         }
-        //     }
-        //     console.log(state)
-        // }
-
-
-
-
 
         case actionType.STORE__CLEAR:
             state = initRecordData;

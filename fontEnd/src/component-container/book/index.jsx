@@ -1,6 +1,7 @@
 
 import React, { Component } from "react";
-import { Popover, NavBar, Icon, TextareaItem, ImagePicker, Button } from 'antd-mobile';
+import ReactDOM from 'react-dom';
+import { Popover, NavBar, Icon, TextareaItem, ImagePicker, Button, PullToRefresh } from 'antd-mobile';
 import { Link, Route, BrowserRouter, Switch, Redirect, withRouter } from 'react-router-dom';
 
 
@@ -26,8 +27,9 @@ class book extends Component {
             viewFile: [],
             isOpen: false,
             index: 0,
-            bookWay: "simple"
-
+            bookWay: "simple",
+            refreshing: false,
+            height: document.documentElement.clientHeight,
         };
         this.handleVisibleChange = this.handleVisibleChange.bind(this)
         this.onSelect = this.onSelect.bind(this)
@@ -58,6 +60,11 @@ class book extends Component {
                 userId
             })
         }
+        const hei = this.state.height - ReactDOM.findDOMNode(this.ptr).offsetTop;
+        setTimeout(() => this.setState({
+            height: hei,
+            // data: genData(),
+        }), 0);
     }
     componentDidUpdate() {
         let {
@@ -76,6 +83,7 @@ class book extends Component {
         if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
             this.getRecord()
         }
+
     }
 
     // 获取某人的某个习惯的图文
@@ -86,11 +94,18 @@ class book extends Component {
         let {
             id: habitId
         } = this.props.match.params;
+        let {
+            tempRecord
+        } = this.props.record;
         let userId = window.localStorage.getItem("userId");
+
+        let lastRecord = tempRecord.length > 0 ? tempRecord[tempRecord.length - 1]._id : ''
+        console.log(lastRecord)
 
         async_getRecord({
             userId,
-            habitId
+            habitId,
+            lastRecord
         })
     }
     onChange = (files, type, index) => {
@@ -188,8 +203,8 @@ class book extends Component {
         this.state.bookWay === "record" ? (
             this.setState({
                 bookWay: "simple",
-                text:'',
-                files:[]
+                text: '',
+                files: []
             })
         ) : '';
     }
@@ -320,12 +335,31 @@ class book extends Component {
                 >
                     {habit ? habit.habitName : ''}
                 </NavBar>
-                <div className={`${style.wrap}`}>
-                    {this.renderBook(this.state.bookWay, bookHabit)}
+                <div>
+                    <PullToRefresh
+                        damping={60}
+                        ref={el => this.ptr = el}
+                        style={{
+                            height: this.state.height,
+                            overflow: 'auto',
+                        }}
+                        indicator={{ deactivate: '上拉可以刷新' }}
+                        direction={'up'}
+                        refreshing={this.state.refreshing}
+                        onRefresh={() => {
+                            this.getRecord()
+                            console.log('shuaxin')
+                        }}
+                    >
+                        <div className={`${style.wrap}`}>
+                            {this.renderBook(this.state.bookWay, bookHabit)}
+                        </div>
+                        <div className={`${style.book_wrap}`}>
+                            {detail ? detail : loading()}
+                        </div>
+                    </PullToRefresh>
                 </div>
-                <div className={`${style.book_wrap}`}>
-                    {detail ? detail : loading()}
-                </div>
+
             </div>
         )
     }
