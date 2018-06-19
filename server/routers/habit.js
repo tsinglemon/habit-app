@@ -2,6 +2,7 @@
 
 
 const express = require('express');
+const mongoose = require('mongoose');
 
 // 设置存储上传文件名和路径的配置
 const multer = require('multer')
@@ -370,7 +371,7 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
     let urls = []
     req.files.map((item, index) => {
         let url = item.path.replace(/static\\/, "").replace("\\", "/");
-        return urls.push(`http://localhost:3008/${url}`);
+        return urls.push(`http://192.168.1.105:3008/${url}`);
     })
 
     habit_record.create({
@@ -426,21 +427,26 @@ router.get('/getRecord', (req, res) => {
 
     let userId = req.query.userId;
     let habitId = req.query.habitId;
-    let page = req.query.page ? req.query.page : 1
+    // 用客户端最后一条ID作为下一条的开始
+    let lastRecord = req.query.lastRecord;
+
     /**
      * 这里可以根据用户、习惯、日期来进行分别查询
      */
     // 找某个人的某个习惯的图文
+    let id = mongoose.Types.ObjectId();
+    console.log(JSON.stringify(id))
     habit_record.find({
         user: userId,
-        habit: habitId
+        habit: habitId,
+        _id: { '$lt': lastRecord?lastRecord:id }
     }).populate({
         path: 'user'
     }).populate({
         path: 'habit'
     }).populate({
         path: 'comment.user'
-    }).sort({ '_id': -1 }).skip((page - 1) * 5).limit(3).exec((err, msg) => {
+    }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
         let isHaveDate = '';
         if (msg.length > 0) {
             isHaveDate = '1';
@@ -458,7 +464,7 @@ router.get('/getRecord', (req, res) => {
         })
         res.json({
             isHaveDate,
-            type: 'list',
+            type: lastRecord?'up':'list',
             recordList: margeComment
         })
     })
@@ -609,7 +615,7 @@ router.post('/delComment', (req, res) => {
     let userId = req.body.userId;
     let recordId = req.body.recordId;
     let commentId = req.body.commentId;
-    
+
     habit_record.findOneAndUpdate({
         _id: recordId
     }, {
