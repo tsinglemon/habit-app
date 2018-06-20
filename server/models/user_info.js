@@ -35,7 +35,7 @@ var option = {
         count: Number,
         isClockIn: Boolean
     }],
-    collect: [],
+    // collect: [],
     
 
 }

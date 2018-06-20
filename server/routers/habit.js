@@ -39,11 +39,13 @@ const habit_all = require('../models/habit_all.js')
 const habit_record = require('../models/habit_record.js')
 const user_info = require('../models/user_info.js')
 const user_attention = require('../models/user_attention.js')
+const user_collect = require('../models/user_collect.js')
 
 
 // 获取个人加入的习惯
 router.get('/getHabits', (req, res) => {
     let userId = req.query.userId;
+    console.log(userId)
     user_info.findOne({
         user: userId
     }).populate({
@@ -59,7 +61,6 @@ router.get('/getHabits', (req, res) => {
 router.get('/search', (req, res) => {
     let habitName = req.query.habitName;
     let userId = req.query.userId;
-    let page = req.query.page;
     // let reg = new RegExp('^'+habitName+'$','i');
     let reg = new RegExp(habitName, 'i');
 
@@ -199,6 +200,7 @@ router.get('/createHabit', (req, res) => {
         }
     })
 })
+
 
 // 添加个人习惯
 router.get('/addHabit', (req, res) => {
@@ -402,6 +404,8 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
 
 
 // 删除图文记录
+// 删除了自己的图文，别人要是收藏过就会查不到，解决办法除了这里使用的直接也删掉收藏者的图文，
+// 还可以只是删掉这条图文的数据，保留该图文的ID不变，这样可以避免查询关联的图文时出错。
 router.post('/delRecord', (req, res) => {
 
     let userId = req.body.userId;
@@ -411,14 +415,18 @@ router.post('/delRecord', (req, res) => {
         user: userId,
         _id: recordId
     }, (err, msg) => {
-        msg.n === 1 ?
-            res.json({
-                type: 'del',
-                recordList: [{
-                    _id: recordId
-                }]
-            }) :
-            res.json(msg)
+        user_collect.remove({
+            recordId
+        }, (err, removeInfo) => {
+            msg.n === 1 ?
+                res.json({
+                    type: 'del',
+                    recordList: [{
+                        _id: recordId
+                    }]
+                }) :
+                res.json(msg)
+        })
     })
 })
 
@@ -429,54 +437,129 @@ router.get('/getRecord', (req, res) => {
     let habitId = req.query.habitId;
     // 用客户端最后一条ID作为下一条的开始
     let lastRecord = req.query.lastRecord;
+    let type = req.query.type;
+
     // 让该ObjectId成为当前全局最新最大的，然后返回没它大的ObjectId对应的数据到客户端
     let id = mongoose.Types.ObjectId();
     /**
      * 这里可以根据用户、习惯、日期来进行分别查询
      */
-    // 找某个人的某个习惯的图文
-    let userRecord = {
-        user: userId,
-        habit: habitId,
-        _id: { '$lt': lastRecord ? lastRecord : id }
-    }
-    let allRecord = {
-        habit: habitId,
-        _id: { '$lt': lastRecord ? lastRecord : id }
-    }
     let findObj = {}
-    findObj = userId && habitId ? userRecord :
-        habitId ? allRecord : {};
+    switch (type) {
+        case 'getUserHabitRecord':
+            // 找某个人的某个习惯的图文
+            findObj = {
+                user: userId,
+                habit: habitId,
+                _id: { '$lt': lastRecord ? lastRecord : id }
+            }
+            break;
+        case 'getHabitRecord':
+            // 找某个习惯的所有人的图文
+            findObj = {
+                habit: habitId,
+                _id: { '$lt': lastRecord ? lastRecord : id }
+            }
+            break;
+    }
+    if (type === 'myCollect') {
+        // 收藏的图文
+        user_collect.find({
+            user: userId,
+            _id: { '$lt': lastRecord ? lastRecord : id }
+        }).populate({
+            path: 'user'
+        }).populate({
+            path: 'recordId',
+            populate: {
+                path: 'user'
+            },
+        }).populate({
+            path: 'recordId',
+            populate: {
+                path: 'habit'
+            }
+        }).populate({
+            path: 'recordId',
+            populate: {
+                path: 'comment.user'
+            }
+        }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
 
-    habit_record.find(findObj).populate({
-        path: 'user'
-    }).populate({
-        path: 'habit'
-    }).populate({
-        path: 'comment.user'
-    }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
-        let isHaveDate = '';
-        if (msg.length > 0) {
-            isHaveDate = '1';
-        } else {
-            isHaveDate = '0'
-        }
-        // 最新的评论在最上面，最早的评论在下面
-        let margeComment = msg.map((item) => {
-            if (item.comment[0]) {
-                item.comment.sort((n1, n2) => {
-                    return n2.time - n1.time
+            let isHaveDate = '';
+            if (msg.length > 0) {
+                isHaveDate = '1';
+            } else {
+                isHaveDate = '0'
+            }
+            // 最新的评论在最上面，最早的评论在下面
+
+            let margeComment = msg.map((item, index) => {
+
+                if (item.recordId.comment[0]) {
+                    item.recordId.comment.sort((n1, n2) => {
+                        return n2.time - n1.time
+                    })
+                }
+                // 为了方便前端统一处理数据格式，所以统一返回相同格式
+                return item.recordId
+            })
+            // 如果上拉还有数据就继续取最后一个id，如果没有数据就取最后一次加载的最后一个id
+            let lastId = msg.length > 0 ? msg[msg.length - 1]._id : lastRecord
+            res.json({
+                isHaveDate,
+                type: lastRecord ? 'up' : 'list',
+                recordList: margeComment,
+                lastRecord: lastId
+            })
+        })
+
+    } else {
+        habit_record.find(findObj).populate({
+            path: 'user'
+        }).populate({
+            path: 'habit'
+        }).populate({
+            path: 'comment.user'
+        }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
+            let isHaveDate = '';
+            if (msg.length > 0) {
+                isHaveDate = '1';
+            } else {
+                isHaveDate = '0'
+            }
+            // 最新的评论在最上面，最早的评论在下面
+            let margeComment = msg.map((item) => {
+                if (item.comment[0]) {
+                    item.comment.sort((n1, n2) => {
+                        return n2.time - n1.time
+                    })
+                }
+                return item
+            })
+            let isJoinHabit = '未定义';
+
+            if (type === 'getHabitRecord') {
+                user_info.findOne({
+                    user: userId,
+                    "habits.habit": findObj.habit
+                }, (err, msg) => {
+                    // 查询自己有没有加入这个习惯
+                    isJoinHabit = msg ? true : false;
                 })
             }
-            return item
+            res.json({
+                userId,
+                habitId,
+                isJoinHabit,
+                isHaveDate,
+                type: lastRecord ? 'up' : 'list',
+                recordList: margeComment
+            })
         })
-        res.json({
-            isHaveDate,
-            type: lastRecord ? 'up' : 'list',
-            recordList: margeComment
-        })
-    })
-    // 找某个习惯的所有图文
+    }
+
+
     // 找点赞数最多的图文
 
 })
@@ -503,16 +586,17 @@ router.get('/like', (req, res) => {
                     new: true
                 }, (err, msg) => {
                     // 取消用户点赞过的图文
-                    user_info.update({ user: userId }, {
-                        $pull: {
-                            collect: recordId
-                        }
-                    }, (err) => {
-                        err ? res.json(err) :
+
+                    user_collect.remove({
+                        user: userId,
+                        recordId
+                    }, (err, removeInfo) => {
+                        removeInfo.n === 1 ?
                             res.json({
                                 type: 'update',
                                 recordList: [msg]
-                            })
+                            }) :
+                            res.json(err)
                     })
                 })
         } else {
@@ -528,12 +612,12 @@ router.get('/like', (req, res) => {
                     new: true
                 }, (err, msg) => {
                     // 记录用户点赞过的图文
-                    user_info.update({ user: userId }, {
-                        $push: {
-                            collect: [recordId]
-                        }
+                    user_collect.create({
+                        user: userId,
+                        recordId
                     }, (err) => {
-                        err ? res.json(err) :
+                        err ?
+                            res.json(err) :
                             res.json({
                                 type: 'update',
                                 recordList: [msg]
