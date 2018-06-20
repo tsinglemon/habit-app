@@ -32,7 +32,7 @@ export default class extends Component {
                         <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
                     </Link>
                     <div className={`${style.head_description}`}>
-                        <h3 className={`${style.head_userName}`}> <Link to="/discover/">{item.user.userName}</Link> </h3>
+                        <h3 className={`${style.head_userName}`}> {item.user.userName} </h3>
                         <span className={`${style.head_habit}`}>坚持<Link className={`${style.head_habitLink}`} to={`/record/${item.habit._id}/`}>#{item.habit.habitName}#</Link></span>
                     </div>
                 </div>

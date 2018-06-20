@@ -104,11 +104,14 @@ class itemRecords extends Component {
         let {
             tempRecord
         } = this.props.record;
+        let userId = window.localStorage.getItem('userId');
         let lastRecord = tempRecord && tempRecord.length > 0 ? tempRecord[tempRecord.length - 1]._id : ''
 
         async_getRecord({
+            userId,
             habitId,
-            lastRecord
+            lastRecord,
+            type: 'getHabitRecord'
         })
     }
 
@@ -116,9 +119,12 @@ class itemRecords extends Component {
 
         let {
             tempRecord,
-            isHaveDate
-        } = this.props.record;
+            isHaveDate,
+            isJoinHabit
+        } = this.props.record; 
+        let userId = window.localStorage.getItem('userId');
         let detail = '';
+        let publicInfo = {}
 
         if (tempRecord && tempRecord.length > 0) {
             detail = tempRecord.map((item, index) => {
@@ -126,6 +132,11 @@ class itemRecords extends Component {
                     <Detail key={item._id} item={item} />
                 )
             })
+            publicInfo = {
+                habitName: tempRecord[0].habit.habitName,
+                habitId: tempRecord[0].habit._id,
+                isJoinHabit
+            }
         }
         let loading = () => {
             if (isHaveDate === '0') {
@@ -141,7 +152,7 @@ class itemRecords extends Component {
                     leftContent={<Icon type="left" />}
                     onLeftClick={this.goBack}
                 >
-                    画画
+                    {publicInfo.habitName}
                 </NavBar>
                 {/* 判断用户有没有这个习惯，如果有就显示画画社区，如果没有就在右侧增加“加入”按钮 */}
                 <div>
@@ -157,17 +168,28 @@ class itemRecords extends Component {
                         refreshing={this.state.refreshing}
                         onRefresh={() => {
                             this.getRecord()
-                            console.log('shuaxin')
                         }}
                     >
                         <div className={`${style.wrap}`}>
-                            <h3 className={`${style.header}`}>画画社区</h3>
+                            <h3 className={`${style.header}`}>{publicInfo.habitName}&nbsp;&nbsp;社区</h3>
                             <Button
+                                disabled={publicInfo.isJoinHabit}
                                 type="primary"
                                 className={`${style.add}`}
                                 activeClassName={`${style.active}`}
-                                onClick={(e) => { this.replace('/habit') }}
-                            >加入</Button>
+                                style={publicInfo.isJoinHabit ? { border: 'none', background: '#a5ada9' } : null}
+                                onClick={(e) => {
+                                    let {
+                                        async_addHabit
+                                    } = this.props.actionMethod;
+                                    async_addHabit({
+                                        habitId: publicInfo.habitId,
+                                        userId
+                                    })
+                                }}
+                            >
+                                {publicInfo.isJoinHabit ? '已加入' : '加入'}
+                            </Button>
                         </div>
                         <div className={`${style.book_wrap}`}>
                             {detail ? detail : loading()}
@@ -182,9 +204,10 @@ class itemRecords extends Component {
 const mapStateToProps = (state) => {
     let {
         userinfo,
-        record
+        record,
+        habit
     } = state
-    return { userinfo, record };
+    return { userinfo, record, habit };
 }
 const mapDispatchToProps = (dispath) => {
     return {

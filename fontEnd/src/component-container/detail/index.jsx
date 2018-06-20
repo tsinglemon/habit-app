@@ -12,17 +12,18 @@ import Detail_footer from './detail_footer.jsx';
 import { PullToRefresh, Button } from 'antd-mobile';
 
 export default class extends Component {
-    render(){
+    render() {
         let {
-            item
+            item,
+            match
         } = this.props;
         if (!item) return (<div></div>)
 
-        return(
+        return (
             <div className={`${style.detail_wrap}`}>
                 <Detail_head item={item} />
-                <Detail_body item={item}/>
-                <Detail_footer item={item}/>
+                <Detail_body item={item} />
+                <Detail_footer item={item} match={match} />
             </div>
         )
     }

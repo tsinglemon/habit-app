@@ -90,6 +90,7 @@ function* habit(action) {
                         userId: action.data.userId,
                     }
                 })
+                console.log(sagaData)
                 yield put(actionMethod.store_habitData(sagaData));
             } catch (e) {
                 console.log(e)
@@ -191,14 +192,16 @@ function* record(action) {
                 let {
                     userId,
                     habitId,
-                    lastRecord
+                    lastRecord,
+                    type
                 } = action.data;
 
                 let sagaData = yield call(axios.get, "/api/habit/getRecord", {
                     params: {
                         userId,
                         habitId,
-                        lastRecord
+                        lastRecord,
+                        type
                     }
                 })
                 console.log(sagaData)
@@ -309,5 +312,9 @@ export function* habitSaga() {
     yield takeEvery(actionType.COMMENT, record)
     // 删除评论
     yield takeEvery(actionType.DEL_COMMENT, record)
+    // 判断习惯是否已加入
+    // yield takeEvery(actionType.IS_JOIN_HABIT, record)
+
+    // async_isJoinHabit
 }
 

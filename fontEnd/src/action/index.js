@@ -116,6 +116,13 @@ export const async_delComment = (data) => {
         data
     }
 }
+// 判断单个习惯有没加入
+export const async_isJoinHabit = (data) => {
+    return {
+        type: actionType.IS_JOIN_HABIT,
+        data
+    }
+}
 
 
 

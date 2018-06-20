@@ -123,7 +123,8 @@ class book extends Component {
         async_getRecord({
             userId,
             habitId,
-            lastRecord
+            lastRecord,
+            type:'getUserHabitRecord'
         })
     }
     onChange = (files, type, index) => {

@@ -74,7 +74,6 @@ export default connect(
 
         // 评论
         sendValue(comment) {
-            console.log(comment)
             let {
                 async_comment,
                 async_delComment
@@ -88,11 +87,10 @@ export default connect(
             let userId = window.localStorage.getItem('userId');
             let recordId = item._id;
             let inputValue = this.autoFocusInst.inputRef.props.value.trim()
-            if (inputValue === '') {
-                return;
-            }
+
 
             if (comment === undefined) {
+                if (inputValue === '') return;
                 async_comment({
                     userId,
                     otherUserComment,
@@ -122,7 +120,11 @@ export default connect(
             }
         }
         onBlur() {
-            // 防止在点击发送时的失焦导致清空 @信息
+            let {
+                otherUserComment
+            } = this.state;
+            if (otherUserComment === null) return;
+            // 定时器是防止在点击发送时的失焦导致清空 @信息
             setTimeout(() => {
                 this.setState({
                     otherUserComment: null,
@@ -140,7 +142,7 @@ export default connect(
                 async_praise
             } = this.props.actionMethod;
             let userId = window.localStorage.getItem("userId");
-
+            console.log(item._id)
             async_praise({
                 userId,
                 recordId: item._id
@@ -163,8 +165,10 @@ export default connect(
 
         render() {
             let {
-                item: itemRecord
+                item: itemRecord,
+                match
             } = this.props;
+
             let {
                 otherUserComment
             } = this.state;
@@ -175,6 +179,7 @@ export default connect(
                 return item === userId;
             })
             let isSelf = itemRecord.user && itemRecord.user._id === userId;
+            let isPath = match && match.path === '/favorite'
 
             let placeholder = '';
             if (otherUserComment) {
@@ -248,7 +253,7 @@ export default connect(
                     <span className={`iconfont icon-xiaoxi`}
                         onClick={this.showModal('modal')}
                     ><em className={`${style.footer_item}`}>{itemRecord.commentCount}</em></span>
-                    {isSelf ? (
+                    {!isPath && isSelf ? (
                         <span className={`iconfont icon-shanchu`}
                             onClick={() => {
                                 Modal.operation([

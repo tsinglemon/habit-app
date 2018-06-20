@@ -42,6 +42,8 @@ export const PRAISE = "PRAISE";
 export const COMMENT = "COMMENT";
 // 删除评论
 export const DEL_COMMENT = "DEL_COMMENT";
+// 验证习惯是否加入
+export const IS_JOIN_HABIT = "IS_JOIN_HABIT";
 
 
 

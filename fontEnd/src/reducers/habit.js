@@ -27,7 +27,7 @@ export default (state, action) => {
             } = newData.data;
             // 创建、加入后替换对应的状态
             if (isUpdate) {
-                if (searchResult[0]) {
+                if (searchResult[0] && state.searchResult[0]) {
                     searchResult = state.searchResult.map((item, index) => {
                         let update = searchResult.find(
                             (el) => {
@@ -42,19 +42,19 @@ export default (state, action) => {
                     habitList.habits = state.habitList.habits.map((item, index) => {
                         let update = habitList.habits.find(
                             (el) => {
-                                return el.habitName === item.habit.habitName 
+                                return el.habitName === item.habit.habitName
                             });
                         return update ? { ...item, ...update } : item
                     })
                 }
                 // 展示签到状态
-                if (habitList&&habitList.book) {
+                if (habitList && habitList.book) {
                     habitList.habits = state.habitList.habits.map((item, index) => {
                         let update = habitList.book.find(
                             (el) => {
                                 return el.habit._id === item.habit._id
                             });
-                        return update ? { ...item, ...update  } : item
+                        return update ? { ...item, ...update } : item
                     })
                 }
             }

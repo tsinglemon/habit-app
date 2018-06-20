@@ -6,7 +6,9 @@ import * as actionType from '../constants/index.js'
 let initRecordData = {
     // 看别人的和看自己的图文
     isHaveDate: '1',
-    tempRecord: []
+    tempRecord: [],
+    isJoinHabit:false,
+    lastRecord:''
     // 看发现那里的。。。
 };
 
@@ -23,7 +25,9 @@ export default (state, action) => {
                 type,
                 key,
                 recordList,
-                isHaveDate
+                isHaveDate,
+                isJoinHabit,
+                lastRecord
             } = newData.data;
 
             if (type === 'issue') {
@@ -66,7 +70,9 @@ export default (state, action) => {
                     ...state,
                     ...{
                         tempRecord: recordList,
-                        isHaveDate
+                        isHaveDate,
+                        isJoinHabit,
+                        lastRecord                        
                     }
                 }
             } else if (type === 'up') {
@@ -75,7 +81,8 @@ export default (state, action) => {
                 state = {
                     ...state,
                     ...{
-                        tempRecord: [...state.tempRecord, ...recordList]
+                        tempRecord: [...state.tempRecord, ...recordList],
+                        lastRecord
                     }
                 }
             } else {
@@ -83,6 +90,7 @@ export default (state, action) => {
                     ...state,
                     ...{
                         isHaveDate,
+                        isJoinHabit,
                         tempRecord: recordList
                     }
                 }
