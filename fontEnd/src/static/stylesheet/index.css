@@ -95,6 +95,7 @@ body .am-popover-mask {
 }
 .tabHeight .am-tabs-default-bar-underline {
     border-color:#fff;
+    /* border:none; */
 }
 .tabHeight .habitTop {
     justify-content: flex-end;

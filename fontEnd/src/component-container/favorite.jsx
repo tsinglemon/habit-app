@@ -26,17 +26,16 @@ class favorite extends Component {
         setTimeout(() => this.setState({
             height: hei
         }), 0);
-        this.getRecord()
     }
     componentWillUpdate() {
         let {
             tempRecord,
             isHaveDate
         } = this.props.record;
-        if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
-            console.log(tempRecord)
-            this.getRecord()
-        }
+        // if (tempRecord && tempRecord.length <= 0 && isHaveDate === '0') {
+        //     console.log(tempRecord)
+        //     this.getRecord()
+        // }
     }
     componentWillUnmount() {
         let {
@@ -84,10 +83,6 @@ class favorite extends Component {
     render() {
         
         let {
-            match
-        } = this.props;
-        console.log(this.props)
-        let {
             tempRecord,
             isHaveDate
         } = this.props.record;
@@ -96,7 +91,7 @@ class favorite extends Component {
         if (tempRecord && tempRecord.length > 0) {
             detail = tempRecord.map((item, index) => {
                 return (
-                    <Detail key={item._id} item={item} match={match} />
+                    <Detail key={item._id} item={item}/>
                 )
             })
         }

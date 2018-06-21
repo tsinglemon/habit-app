@@ -8,7 +8,8 @@ let initRecordData = {
     isHaveDate: '1',
     tempRecord: [],
     isJoinHabit:false,
-    lastRecord:''
+    lastRecord:'',
+    tabIndex:0,
     // 看发现那里的。。。
 };
 
@@ -27,8 +28,10 @@ export default (state, action) => {
                 recordList,
                 isHaveDate,
                 isJoinHabit,
-                lastRecord
+                lastRecord,
+                tabIndex
             } = newData.data;
+            console.log(type)
 
             if (type === 'issue') {
                 state = {
@@ -86,11 +89,13 @@ export default (state, action) => {
                     }
                 }
             } else {
+                console.log(state.tabIndex)
                 state = {
                     ...state,
                     ...{
                         isHaveDate,
                         isJoinHabit,
+                        tabIndex:tabIndex!==undefined?tabIndex:state.tabIndex,
                         tempRecord: recordList
                     }
                 }

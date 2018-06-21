@@ -21,9 +21,9 @@ import '../static/fonts/iconfont.css';
 class wrap extends Component {
     constructor(props) {
         super(props);
-        let tab = props.location.pathname.replace("/", "")
+        // let tab = props.location.pathname.replace("/", "")
         this.state = {
-            selectedTab: tab,
+            selectedTab: 'habit',
         }
     }
     componentDidMount() {
@@ -43,18 +43,89 @@ class wrap extends Component {
         let {
             isLogin
         } = this.props.userinfo;
+        let {
+            tempRecord,
+            isHaveDate
+        } = this.props.record;
 
         if (!isLogin) {
             this.props.history.replace('/entry')
         }
+        if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
+            this.getRecord()
+        }
+        // if (this.state.selectedTab === 'discover') {
+        //     this.getRecord()
+        // }
+
+    }
+    onTab(tab) {
+        let {
+            store_recordData
+        } = this.props.actionMethod;
+        setTimeout(() => {
+            store_recordData({
+                data: {
+                    type: '-',
+                    isHaveDate: '1',
+                    recordList: [],
+                    // tabIndex
+                }
+            })
+        }, 0)
+        this.setState({
+            selectedTab: tab
+        })
+    }
+    getRecord() {
+        let {
+            async_getRecord
+        } = this.props.actionMethod;
+        let {
+            tabIndex
+        } = this.props.record;
+        let userId = window.localStorage.getItem("userId");
+
+        // this.setState({
+        //     selectedTab: tab
+        // }, () => {
+            console.log(tabIndex)
+        if (this.state.selectedTab === 'discover') {
+            if (tabIndex === 1) {
+                async_getRecord({
+                    userId,
+                    lastRecord: '',
+                    type: 'getNewRecord'
+                })
+            } else if (tabIndex === 0) {
+                console.log(99999999999)
+                async_getRecord({
+                    userId,
+                    lastRecord: '',
+                    type: 'getHotRecord'
+                })
+            } else {
+
+            }
+        }
+        if (this.state.selectedTab === 'favorite') {
+            async_getRecord({
+                userId,
+                lastRecord: '',
+                type: 'myCollect'
+            })
+        }
+
+        // })
     }
 
     render() {
         return (
             <div style={{ position: 'fixed', height: '100%', width: '100%' }}>
-                <Route exact path="/" render={() => (
+                {/* <Route exact path="/" render={() => (
                     <Redirect to="/my" />
-                )} />
+                )} /> */}
+                <Route exact path="/" />
                 <TabBar
                     unselectedTintColor="#999"
                     tintColor="#39cc7b"
@@ -81,7 +152,10 @@ class wrap extends Component {
                         }
                         selected={this.state.selectedTab === 'habit'}
                         // badge={1}
-                        onPress={() => { this.props.history.replace('/habit') }}
+                        // onPress={() => { this.props.history.replace('/habit') }}
+                        onPress={() => {
+                            this.onTab('habit')
+                        }}
                         data-seed="logId"
                     >
                         {<Habit />}
@@ -108,7 +182,9 @@ class wrap extends Component {
                         key="discover"
                         badge={''}
                         selected={this.state.selectedTab === 'discover'}
-                        onPress={() => { this.props.history.replace('/discover') }}
+                        onPress={() => {
+                            this.onTab('discover')
+                        }}
                         data-seed="logId1"
                     >
                         {<Discover />}
@@ -134,7 +210,9 @@ class wrap extends Component {
                         key="favorite"
                         // dot
                         selected={this.state.selectedTab === 'favorite'}
-                        onPress={() => { this.props.history.replace('/favorite') }}
+                        onPress={() => {
+                            this.onTab('favorite')
+                        }}
                     >
                         <Favorite />
                     </TabBar.Item>
@@ -158,7 +236,9 @@ class wrap extends Component {
                         key="my"
                         badge={0}
                         selected={this.state.selectedTab === 'my'}
-                        onPress={() => { this.props.history.replace('/my') }}
+                        onPress={() => {
+                            this.onTab('my')
+                        }}
                     >
                         <My />
                     </TabBar.Item>
@@ -171,9 +251,10 @@ class wrap extends Component {
 }
 const mapStateToProps = (state) => {
     let {
-        userinfo
+        userinfo,
+        record
     } = state
-    return { userinfo };
+    return { userinfo, record };
 }
 const mapDispatchToProps = (dispath) => {
     return {

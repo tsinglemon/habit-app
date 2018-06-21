@@ -451,14 +451,25 @@ router.get('/getRecord', (req, res) => {
             findObj = {
                 user: userId,
                 habit: habitId,
-                _id: { '$lt': lastRecord ? lastRecord : id }
+                _id: { $lt: lastRecord ? lastRecord : id }
             }
             break;
         case 'getHabitRecord':
             // 找某个习惯的所有人的图文
             findObj = {
                 habit: habitId,
-                _id: { '$lt': lastRecord ? lastRecord : id }
+                _id: { $lt: lastRecord ? lastRecord : id }
+            }
+            break;
+        case 'getHotRecord':
+            findObj = {
+                praiseCount: {$gt:0},
+                _id: { $lt: lastRecord ? lastRecord : id }
+            }
+            break;
+        case 'getNewRecord':
+            findObj = {
+                _id: { $lt: lastRecord ? lastRecord : id }
             }
             break;
     }
@@ -493,9 +504,7 @@ router.get('/getRecord', (req, res) => {
                 isHaveDate = '0'
             }
             // 最新的评论在最上面，最早的评论在下面
-
             let margeComment = msg.map((item, index) => {
-
                 if (item.recordId.comment[0]) {
                     item.recordId.comment.sort((n1, n2) => {
                         return n2.time - n1.time
@@ -522,6 +531,8 @@ router.get('/getRecord', (req, res) => {
         }).populate({
             path: 'comment.user'
         }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
+            
+            console.log(type)
             let isHaveDate = '';
             if (msg.length > 0) {
                 isHaveDate = '1';
@@ -537,7 +548,8 @@ router.get('/getRecord', (req, res) => {
                 }
                 return item
             })
-            let isJoinHabit = '未定义';
+            let isJoinHabit = '';
+            let lastId = msg.length > 0 ? msg[msg.length - 1]._id : lastRecord
 
             if (type === 'getHabitRecord') {
                 user_info.findOne({
@@ -545,7 +557,7 @@ router.get('/getRecord', (req, res) => {
                     "habits.habit": findObj.habit
                 }, (err, msg) => {
                     // 查询自己有没有加入这个习惯
-                    isJoinHabit = msg ? true : false;
+                    isJoinHabit = msg ? false : true;
                 })
             }
             res.json({
@@ -553,6 +565,7 @@ router.get('/getRecord', (req, res) => {
                 habitId,
                 isJoinHabit,
                 isHaveDate,
+                lastRecord: lastId,
                 type: lastRecord ? 'up' : 'list',
                 recordList: margeComment
             })

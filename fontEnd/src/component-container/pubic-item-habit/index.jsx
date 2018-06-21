@@ -121,7 +121,7 @@ class itemRecords extends Component {
             tempRecord,
             isHaveDate,
             isJoinHabit
-        } = this.props.record; 
+        } = this.props.record;
         let userId = window.localStorage.getItem('userId');
         let detail = '';
         let publicInfo = {}
@@ -172,24 +172,25 @@ class itemRecords extends Component {
                     >
                         <div className={`${style.wrap}`}>
                             <h3 className={`${style.header}`}>{publicInfo.habitName}&nbsp;&nbsp;社区</h3>
-                            <Button
-                                disabled={publicInfo.isJoinHabit}
-                                type="primary"
-                                className={`${style.add}`}
-                                activeClassName={`${style.active}`}
-                                style={publicInfo.isJoinHabit ? { border: 'none', background: '#a5ada9' } : null}
-                                onClick={(e) => {
-                                    let {
-                                        async_addHabit
-                                    } = this.props.actionMethod;
-                                    async_addHabit({
-                                        habitId: publicInfo.habitId,
-                                        userId
-                                    })
-                                }}
-                            >
-                                {publicInfo.isJoinHabit ? '已加入' : '加入'}
-                            </Button>
+                            {console.log(publicInfo.isJoinHabit)}
+                            {publicInfo.isJoinHabit ? (
+                                <Button
+                                    type="primary"
+                                    className={`${style.add}`}
+                                    activeClassName={`${style.active}`}
+                                    onClick={(e) => {
+                                        let {
+                                            async_addHabit
+                                        } = this.props.actionMethod;
+                                        async_addHabit({
+                                            habitId: publicInfo.habitId,
+                                            userId
+                                        })
+                                    }}
+                                >
+                                    加入
+                                </Button>
+                            ) : null}
                         </div>
                         <div className={`${style.book_wrap}`}>
                             {detail ? detail : loading()}

@@ -142,7 +142,7 @@ export default connect(
                 async_praise
             } = this.props.actionMethod;
             let userId = window.localStorage.getItem("userId");
-            console.log(item._id)
+
             async_praise({
                 userId,
                 recordId: item._id
@@ -156,7 +156,7 @@ export default connect(
                 async_delRecord
             } = this.props.actionMethod;
             let userId = window.localStorage.getItem("userId");
-            console.log(item._id, userId)
+
             async_delRecord({
                 userId,
                 recordId: item._id
@@ -166,7 +166,6 @@ export default connect(
         render() {
             let {
                 item: itemRecord,
-                match
             } = this.props;
 
             let {
@@ -179,7 +178,6 @@ export default connect(
                 return item === userId;
             })
             let isSelf = itemRecord.user && itemRecord.user._id === userId;
-            let isPath = match && match.path === '/favorite'
 
             let placeholder = '';
             if (otherUserComment) {
@@ -253,7 +251,7 @@ export default connect(
                     <span className={`iconfont icon-xiaoxi`}
                         onClick={this.showModal('modal')}
                     ><em className={`${style.footer_item}`}>{itemRecord.commentCount}</em></span>
-                    {!isPath && isSelf ? (
+                    {isSelf ? (
                         <span className={`iconfont icon-shanchu`}
                             onClick={() => {
                                 Modal.operation([

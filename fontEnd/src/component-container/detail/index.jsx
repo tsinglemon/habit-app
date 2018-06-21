@@ -14,8 +14,7 @@ import { PullToRefresh, Button } from 'antd-mobile';
 export default class extends Component {
     render() {
         let {
-            item,
-            match
+            item
         } = this.props;
         if (!item) return (<div></div>)
 
@@ -23,7 +22,7 @@ export default class extends Component {
             <div className={`${style.detail_wrap}`}>
                 <Detail_head item={item} />
                 <Detail_body item={item} />
-                <Detail_footer item={item} match={match} />
+                <Detail_footer item={item} />
             </div>
         )
     }
