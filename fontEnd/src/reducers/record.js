@@ -5,12 +5,12 @@ import * as actionType from '../constants/index.js'
 // 合并并初始化初始值。
 let initRecordData = {
     // 看别人的和看自己的图文
-    isHaveDate: '1',
+    isHaveDate: '0',
     tempRecord: [],
-    isJoinHabit:false,
-    lastRecord:'',
-    tabIndex:0,
-    // 看发现那里的。。。
+    isJoinHabit: false,
+    lastRecord: '',
+    tabIndex: 0,
+    bottomTab: 'discover'
 };
 
 export default (state, action) => {
@@ -29,7 +29,8 @@ export default (state, action) => {
                 isHaveDate,
                 isJoinHabit,
                 lastRecord,
-                tabIndex
+                tabIndex = state.tabIndex,
+                bottomTab = state.bottomTab
             } = newData.data;
 
             if (type === 'issue') {
@@ -74,7 +75,7 @@ export default (state, action) => {
                         tempRecord: recordList,
                         isHaveDate,
                         isJoinHabit,
-                        lastRecord                        
+                        lastRecord
                     }
                 }
             } else if (type === 'up') {
@@ -93,7 +94,8 @@ export default (state, action) => {
                     ...{
                         isHaveDate,
                         isJoinHabit,
-                        tabIndex:tabIndex!==undefined?tabIndex:state.tabIndex,
+                        tabIndex: tabIndex !== undefined ? tabIndex : state.tabIndex,
+                        bottomTab: bottomTab !== undefined ? bottomTab : state.bottomTab,
                         tempRecord: recordList
                     }
                 }

@@ -10,14 +10,21 @@ class mycenter extends Component {
 
         };
     }
-    componentDidMount(){
-       
+    componentDidMount() {
+
     }
 
 
     render() {
         return (
-            <div className={`${style.wrap}`} >
+            <div className={`${style.wrap}`}
+            style={{position:'relative'}}
+             >
+                
+                {/* TODO */}
+                <div className={`${style.todoMask}`}></div>
+                
+
                 <div className={`${style.header}`}>
                     <div className={`${style.picWrap}`}>
                         <div className={`${style.pic}`}>

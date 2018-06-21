@@ -92,8 +92,6 @@ class discover extends Component {
         } else {
 
         }
-
-
     }
     onTab(index) {
         let {

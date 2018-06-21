@@ -45,10 +45,9 @@ class my extends Component {
         } = this.props.actionMethod;
         window.localStorage.clear();
         store_clear({})
-        
+
         this.props.history.replace('/entry')
     }
-
 
     render() {
         return (
@@ -65,7 +64,8 @@ class my extends Component {
                 >
                     我的中心
                 </NavBar>
-                <div style={{ marginTop: "44px" }}>
+                <div style={{ marginTop: "44px" }}
+                >
                     <MyCenter />
                 </div>
             </div>
@@ -76,9 +76,10 @@ class my extends Component {
 const mapStateToProps = (state) => {
     let {
         userinfo,
-        habit
+        habit,
+        record
     } = state
-    return { userinfo };
+    return { userinfo, habit, record };
 }
 const mapDispatchToProps = (dispath) => {
     return {

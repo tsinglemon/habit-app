@@ -22,9 +22,9 @@ class wrap extends Component {
     constructor(props) {
         super(props);
         // let tab = props.location.pathname.replace("/", "")
-        this.state = {
-            selectedTab: 'discover',
-        }
+        // this.state = {
+        //     selectedTab: 'discover',
+        // }
     }
     componentDidMount() {
         let {
@@ -38,6 +38,7 @@ class wrap extends Component {
                 token: token
             }
         })
+        this.getRecord()
     }
     componentDidUpdate() {
         let {
@@ -51,13 +52,9 @@ class wrap extends Component {
         if (!isLogin) {
             this.props.history.replace('/entry')
         }
-        if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
-            this.getRecord()
-        }
-        // if (this.state.selectedTab === 'discover') {
-        //     this.getRecord()
+        // if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
+        //     console.log(tempRecord)
         // }
-
     }
     onTab(tab) {
         let {
@@ -69,13 +66,21 @@ class wrap extends Component {
                     type: '-',
                     isHaveDate: '1',
                     recordList: [],
-                    // tabIndex
+                    bottomTab:tab
                 }
             })
         }, 0)
-        this.setState({
-            selectedTab: tab
-        })
+        // this.setState({
+        //     selectedTab: this.props.record.bottomTab
+        // }, () => {
+        //     let {
+        //         store_recordData
+        //     } = this.props.actionMethod;
+        //     if (this.state.selectedTab === 'my') {
+
+               
+        //     }
+        // })
     }
     getRecord() {
         let {
@@ -86,7 +91,7 @@ class wrap extends Component {
         } = this.props.record;
         let userId = window.localStorage.getItem("userId");
 
-        if (this.state.selectedTab === 'discover') {
+        if (this.props.record.bottomTab === 'discover') {
             if (tabIndex === 1) {
                 async_getRecord({
                     userId,
@@ -103,13 +108,13 @@ class wrap extends Component {
 
             }
         }
-        if (this.state.selectedTab === 'favorite') {
-            async_getRecord({
-                userId,
-                lastRecord: '',
-                type: 'myCollect'
-            })
-        }
+        // if (this.state.selectedTab === 'favorite') {
+        //     async_getRecord({
+        //         userId,
+        //         lastRecord: '',
+        //         type: 'myCollect'
+        //     })
+        // }
     }
 
     render() {
@@ -143,7 +148,7 @@ class wrap extends Component {
                         }}
                         />
                         }
-                        selected={this.state.selectedTab === 'habit'}
+                        selected={this.props.record.bottomTab === 'habit'}
                         // badge={1}
                         // onPress={() => { this.props.history.replace('/habit') }}
                         onPress={() => {
@@ -174,7 +179,7 @@ class wrap extends Component {
                         title="发现"
                         key="discover"
                         badge={''}
-                        selected={this.state.selectedTab === 'discover'}
+                        selected={this.props.record.bottomTab === 'discover'}
                         onPress={() => {
                             this.onTab('discover')
                         }}
@@ -202,7 +207,7 @@ class wrap extends Component {
                         title="收藏"
                         key="favorite"
                         // dot
-                        selected={this.state.selectedTab === 'favorite'}
+                        selected={this.props.record.bottomTab === 'favorite'}
                         onPress={() => {
                             this.onTab('favorite')
                         }}
@@ -228,7 +233,7 @@ class wrap extends Component {
                         title="我的"
                         key="my"
                         badge={0}
-                        selected={this.state.selectedTab === 'my'}
+                        selected={this.props.record.bottomTab === 'my'}
                         onPress={() => {
                             this.onTab('my')
                         }}

@@ -28,9 +28,12 @@ export default class extends Component {
         return (
             <div className={`${style.head_wrap}`}>
                 <div className={`${style.head_userInfo}`} >
-                    <Link to="/discover" className={`${style.head_pic}`}>
+                    {/* <Link to="/discover" className={`${style.head_pic}`}>
                         <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
-                    </Link>
+                    </Link> */}
+                    <div className={`${style.head_pic}`}>
+                        <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
+                    </div>
                     <div className={`${style.head_description}`}>
                         <h3 className={`${style.head_userName}`}> {item.user.userName} </h3>
                         <span className={`${style.head_habit}`}>坚持<Link className={`${style.head_habitLink}`} to={`/record/${item.habit._id}/`}>#{item.habit.habitName}#</Link></span>
