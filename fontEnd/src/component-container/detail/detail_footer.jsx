@@ -142,8 +142,9 @@ export default connect(
                 async_praise
             } = this.props.actionMethod;
             let userId = window.localStorage.getItem("userId");
-
+            
             async_praise({
+                author:item.user._id,
                 userId,
                 recordId: item._id
             })

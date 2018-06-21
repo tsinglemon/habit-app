@@ -13,6 +13,10 @@ var option = {
         type: Schema.Types.ObjectId,
         ref: "user_security"
     },
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: "user_security"
+    },
     recordId: {
         type: Schema.Types.ObjectId,
         ref: "habit_record"

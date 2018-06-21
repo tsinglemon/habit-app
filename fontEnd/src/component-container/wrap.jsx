@@ -23,7 +23,7 @@ class wrap extends Component {
         super(props);
         // let tab = props.location.pathname.replace("/", "")
         this.state = {
-            selectedTab: 'habit',
+            selectedTab: 'discover',
         }
     }
     componentDidMount() {
@@ -86,10 +86,6 @@ class wrap extends Component {
         } = this.props.record;
         let userId = window.localStorage.getItem("userId");
 
-        // this.setState({
-        //     selectedTab: tab
-        // }, () => {
-            console.log(tabIndex)
         if (this.state.selectedTab === 'discover') {
             if (tabIndex === 1) {
                 async_getRecord({
@@ -98,7 +94,6 @@ class wrap extends Component {
                     type: 'getNewRecord'
                 })
             } else if (tabIndex === 0) {
-                console.log(99999999999)
                 async_getRecord({
                     userId,
                     lastRecord: '',
@@ -115,8 +110,6 @@ class wrap extends Component {
                 type: 'myCollect'
             })
         }
-
-        // })
     }
 
     render() {

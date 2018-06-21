@@ -47,6 +47,19 @@ class addHabit extends Component {
             this.props.history.replace('/entry')
         }
     }
+    componentWillUnmount() {
+        let {
+            store_habitData
+        } = this.props.actionMethod;
+        // 返回上一页前清空搜索结果，不清空会影响习惯图文列表中的加入功能。
+        setTimeout(() => {
+            store_habitData({
+                data: {
+                    searchResult: []
+                }
+            })
+        }, 0)
+    }
     forward(e) {
         this.props.history.push(e);
     }

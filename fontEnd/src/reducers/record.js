@@ -31,7 +31,6 @@ export default (state, action) => {
                 lastRecord,
                 tabIndex
             } = newData.data;
-            console.log(type)
 
             if (type === 'issue') {
                 state = {
@@ -89,7 +88,6 @@ export default (state, action) => {
                     }
                 }
             } else {
-                console.log(state.tabIndex)
                 state = {
                     ...state,
                     ...{

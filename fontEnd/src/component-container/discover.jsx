@@ -118,6 +118,9 @@ class discover extends Component {
             tempRecord,
             isHaveDate
         } = this.props.record;
+        let {
+            tabIndex
+        } = this.props.record;
         let detail = '';
 
         if (tempRecord && tempRecord.length > 0) {
@@ -151,6 +154,7 @@ class discover extends Component {
                     onChange={(tab, index) => {
                         this.onTab(index)
                     }}
+                    page={tabIndex}
                 >
                     <div style={{ margin: "10px" }}>
                         <PullToRefresh

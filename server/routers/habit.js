@@ -279,10 +279,11 @@ router.post('/delHabit', (req, res) => {
                     }
                 }, (err, msg) => {
                     habit_record.remove({
-                        user: userId,
-                        habit: habitId
+                        user: userId
                     }, (err, msg) => {
-                        // res.json(msg)
+                        user_collect.remove({
+                            author:userId
+                        },(err,r)=>{})
                     })
 
                     habit_all.findOneAndUpdate({
@@ -463,7 +464,7 @@ router.get('/getRecord', (req, res) => {
             break;
         case 'getHotRecord':
             findObj = {
-                praiseCount: {$gt:0},
+                praiseCount: { $gt: 1 },
                 _id: { $lt: lastRecord ? lastRecord : id }
             }
             break;
@@ -531,7 +532,7 @@ router.get('/getRecord', (req, res) => {
         }).populate({
             path: 'comment.user'
         }).sort({ '_id': -1 }).limit(3).exec((err, msg) => {
-            
+
             console.log(type)
             let isHaveDate = '';
             if (msg.length > 0) {
@@ -558,28 +559,36 @@ router.get('/getRecord', (req, res) => {
                 }, (err, msg) => {
                     // 查询自己有没有加入这个习惯
                     isJoinHabit = msg ? false : true;
+                    res.json({
+                        userId,
+                        habitId,
+                        isJoinHabit,
+                        isHaveDate,
+                        lastRecord: lastId,
+                        type: lastRecord ? 'up' : 'list',
+                        recordList: margeComment
+                    })
+                })
+            } else {
+                res.json({
+                    userId,
+                    habitId,
+                    isJoinHabit,
+                    isHaveDate,
+                    lastRecord: lastId,
+                    type: lastRecord ? 'up' : 'list',
+                    recordList: margeComment
                 })
             }
-            res.json({
-                userId,
-                habitId,
-                isJoinHabit,
-                isHaveDate,
-                lastRecord: lastId,
-                type: lastRecord ? 'up' : 'list',
-                recordList: margeComment
-            })
         })
     }
-
-
-    // 找点赞数最多的图文
 
 })
 
 // 点赞
 router.get('/like', (req, res) => {
     let userId = req.query.userId;
+    let author = req.query.author;
     let recordId = req.query.recordId;
 
     habit_record.findOne({
@@ -626,6 +635,7 @@ router.get('/like', (req, res) => {
                 }, (err, msg) => {
                     // 记录用户点赞过的图文
                     user_collect.create({
+                        author,
                         user: userId,
                         recordId
                     }, (err) => {

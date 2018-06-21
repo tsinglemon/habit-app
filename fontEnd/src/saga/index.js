@@ -215,12 +215,14 @@ function* record(action) {
             try {
                 let {
                     userId,
+                    author,
                     recordId
                 } = action.data;
 
                 let sagaData = yield call(axios.get, "/api/habit/like", {
                     params: {
                         userId,
+                        author,
                         recordId
                     }
                 })
