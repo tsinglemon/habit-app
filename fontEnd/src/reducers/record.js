@@ -4,7 +4,6 @@ import * as actionType from '../constants/index.js'
 
 // 合并并初始化初始值。
 let initRecordData = {
-    // 看别人的和看自己的图文
     isHaveDate: '0',
     tempRecord: [],
     isJoinHabit: false,

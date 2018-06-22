@@ -205,9 +205,9 @@ export default connect(
                         key={item._id}
                     >
                         <div className={`${style.comment_pic}`}>
-                            <Link to=''>
-                                <img src="http://192.168.1.105:3008/images/default_head.jpg" />
-                            </Link>
+                            <div>
+                                <img src="http://tsinglemon.com/images/default_head.jpg" />
+                            </div>
                         </div>
                         <div className={`${style.comment_body}`}
                             onClick={() => { this.sendValue(item) }}

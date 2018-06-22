@@ -215,7 +215,7 @@ class entry extends Component {
                 <div className={`${style.wrap}`}>
                     <div className={`${style.logo}`}>
                         <div className={`${style.logoPic}`}>
-                            <img src="http://127.0.0.1:3008/images/logo.jpg" alt="" />
+                            <img src="http://tsinglemon.com/images/logo.jpg" alt="" />
                         </div>
                     </div>
                     <InputItem

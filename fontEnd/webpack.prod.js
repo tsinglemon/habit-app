@@ -64,7 +64,7 @@ module.exports = merge(common, {
                 include: [
                     path.resolve(__dirname, "node_modules/normalize.css"),
                     path.resolve(__dirname, "node_modules/antd-mobile"),
-                    path.resolve(__dirname,"node_modules/react-wx-images-viewer"),
+                    path.resolve(__dirname, "node_modules/react-wx-images-viewer"),
                     path.resolve(__dirname, "./src/static/stylesheet")
                 ]
             },
@@ -130,7 +130,13 @@ module.exports = merge(common, {
         extract_index,
         extract_module,
         // 代码压缩
-        new UglifyJsPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false,
+                drop_debugger: true,
+                drop_console: true
+            }
+        }),
         // 定义开发环境，这里定义了开发环境
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')

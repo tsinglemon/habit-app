@@ -52,9 +52,9 @@ class wrap extends Component {
         if (!isLogin) {
             this.props.history.replace('/entry')
         }
-        // if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
-        //     console.log(tempRecord)
-        // }
+        if (tempRecord && tempRecord.length <= 0 && isHaveDate === '1') {
+            console.log(tempRecord)
+        }
     }
     onTab(tab) {
         let {
@@ -70,17 +70,11 @@ class wrap extends Component {
                 }
             })
         }, 0)
-        // this.setState({
-        //     selectedTab: this.props.record.bottomTab
-        // }, () => {
-        //     let {
-        //         store_recordData
-        //     } = this.props.actionMethod;
-        //     if (this.state.selectedTab === 'my') {
-
-               
-        //     }
-        // })
+        this.setState({
+            selectedTab: this.props.record.bottomTab
+        }, () => {
+            if (this.state.selectedTab === 'my') {}
+        })
     }
     getRecord() {
         let {
@@ -108,13 +102,6 @@ class wrap extends Component {
 
             }
         }
-        // if (this.state.selectedTab === 'favorite') {
-        //     async_getRecord({
-        //         userId,
-        //         lastRecord: '',
-        //         type: 'myCollect'
-        //     })
-        // }
     }
 
     render() {
@@ -137,14 +124,14 @@ class wrap extends Component {
                         icon={<div style={{
                             width: '24px',
                             height: '24px',
-                            background: 'url(http://192.168.1.105:3008/icon-svg/habit.svg) center center /  24px 24px no-repeat'
+                            background: 'url(http://tsinglemon.com/icon-svg/habit.svg) center center /  24px 24px no-repeat'
                         }}
                         />
                         }
                         selectedIcon={<div style={{
                             width: '24px',
                             height: '24px',
-                            background: 'url(http://192.168.1.105:3008/icon-svg/habit-selected.svg) center center /  24px 24px no-repeat'
+                            background: 'url(http://tsinglemon.com/icon-svg/habit-selected.svg) center center /  24px 24px no-repeat'
                         }}
                         />
                         }
@@ -164,7 +151,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/discover.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/discover.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -172,7 +159,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/discover-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/discover-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -192,7 +179,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/favorite.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/favorite.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -200,7 +187,7 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/favorite-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/favorite-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }
@@ -219,14 +206,14 @@ class wrap extends Component {
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/my.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/my.svg) center center /  24px 24px no-repeat'
                             }}
                             />}
                         selectedIcon={
                             <div style={{
                                 width: '24px',
                                 height: '24px',
-                                background: 'url(http://192.168.1.105:3008/icon-svg/my-selected.svg) center center /  24px 24px no-repeat'
+                                background: 'url(http://tsinglemon.com/icon-svg/my-selected.svg) center center /  24px 24px no-repeat'
                             }}
                             />
                         }

@@ -32,7 +32,7 @@ export default class extends Component {
                         <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
                     </Link> */}
                     <div className={`${style.head_pic}`}>
-                        <img src="http://192.168.1.105:3008/images/default_head.jpg" alt="" />
+                        <img src="http://tsinglemon.com/images/default_head.jpg" alt="" />
                     </div>
                     <div className={`${style.head_description}`}>
                         <h3 className={`${style.head_userName}`}> {item.user.userName} </h3>

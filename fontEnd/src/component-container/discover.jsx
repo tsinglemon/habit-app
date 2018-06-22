@@ -73,24 +73,34 @@ class discover extends Component {
             lastRecord: lastId,
             tabIndex
         } = this.props.record;
+        let {
+            bottomTab
+        } = this.props.record
 
         let userId = window.localStorage.getItem("userId");
         let lastRecord = tempRecord.length > 0 ? lastId : ''
 
-        if (tabIndex === 1) {
+        if (bottomTab === 'discover') {
+            if (tabIndex === 1) {
+                async_getRecord({
+                    userId,
+                    lastRecord,
+                    type: 'getNewRecord'
+                })
+            } else if (tabIndex === 0) {
+                async_getRecord({
+                    userId,
+                    lastRecord,
+                    type: 'getHotRecord'
+                })
+            }
+        }
+        if (bottomTab === 'favorite') {
             async_getRecord({
                 userId,
-                lastRecord,
-                type: 'getNewRecord'
+                lastRecord: '',
+                type: 'myCollect'
             })
-        } else if (tabIndex === 0) {
-            async_getRecord({
-                userId,
-                lastRecord,
-                type: 'getHotRecord'
-            })
-        } else {
-
         }
     }
     onTab(index) {
@@ -104,7 +114,7 @@ class discover extends Component {
                         type: '-',
                         isHaveDate: '1',
                         recordList: [],
-                        tabIndex:index
+                        tabIndex: index
                     }
                 })
             }, 0)

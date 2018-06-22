@@ -6,6 +6,9 @@
     background: #fff;
     border-radius: 4px;
 }
+.detail_wrap:last-of-type{
+    margin-bottom:120px;
+}
 .head_wrap {
     display:flex;
     flex-flow:row nowrap;

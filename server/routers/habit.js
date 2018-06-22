@@ -374,7 +374,7 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
     let urls = []
     req.files.map((item, index) => {
         let url = item.path.replace(/static\\/, "").replace("\\", "/");
-        return urls.push(`http://192.168.1.105:3008/${url}`);
+        return urls.push(`http://tsinglemon.com/${url}`);
     })
 
     habit_record.create({
