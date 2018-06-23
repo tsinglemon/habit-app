@@ -1,7 +1,7 @@
 
 import React, { Component } from "react";
 import ReactDOM from 'react-dom';
-import { Popover, NavBar, Icon, TextareaItem, ImagePicker, Button, PullToRefresh } from 'antd-mobile';
+import { Popover, NavBar, Icon, TextareaItem, ImagePicker, Button, PullToRefresh, Toast } from 'antd-mobile';
 import { Link, Route, BrowserRouter, Switch, Redirect, withRouter } from 'react-router-dom';
 
 
@@ -124,7 +124,7 @@ class book extends Component {
             userId,
             habitId,
             lastRecord,
-            type:'getUserHabitRecord'
+            type: 'getUserHabitRecord'
         })
     }
     onChange = (files, type, index) => {
@@ -213,6 +213,11 @@ class book extends Component {
         } = this.props.match.params;
         let userId = window.localStorage.getItem('userId');
         if (text.trim() === '') return;
+        if (files[0].file.size > 5242880) {
+            return (
+                Toast.info('图片大小不能超过5M', 1)
+            )
+        }
         async_issueRecord({
             text,
             files,
@@ -266,7 +271,6 @@ class book extends Component {
                     }}
                 />
                 <div className={`${style.btn}`}>
-                    {/* <span>签到</span> */}
                     <Button
                         type="primary"
                         className={`${style.qiandao}`}

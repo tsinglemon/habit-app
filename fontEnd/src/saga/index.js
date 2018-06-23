@@ -3,6 +3,8 @@
 import { takeEvery, takeLatest } from 'redux-saga';
 import { call, put, take } from 'redux-saga/effects';
 import axios from "axios";
+// axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
+
 
 import * as actionType from '../constants/index.js'
 import * as actionMethod from '../action/index.js';
@@ -162,7 +164,19 @@ function* record(action) {
                     formData.append("recordImage", images[i])
                 }
 
-                let sagaData = yield call(axios.post, "/api/habit/record", formData)
+                // let sagaData = yield call(axios.post, "/api/habit/record", formData,
+                //     {
+                //         headers: { 'Content-Type': 'multipart/form-data' }
+                //     }
+                // )
+                let sagaData = yield call(axios, {
+                    method: 'post',
+                    url: "/api/habit/record",
+                    data: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
                 console.log(sagaData)
                 yield put(actionMethod.store_recordData(sagaData));
             } catch (e) {

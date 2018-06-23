@@ -19,6 +19,7 @@ const multerConfig = {
         }
     }),
     fileFilter: (req, file, cb) => {
+        console.log(file)
         // 允许上传
         cb(null, true)
         // 不允许上传
@@ -27,7 +28,7 @@ const multerConfig = {
     // 一些过滤配置
     limits: {
         // 限制文件大小不能超过5M，单位字节。
-        // fileSize: 5242880
+        fileSize: 30000000
     }
 }
 
@@ -374,7 +375,8 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
     let urls = []
     req.files.map((item, index) => {
         let url = item.path.replace(/static\\/, "").replace("\\", "/");
-        return urls.push(`http://tsinglemon.com/${url}`);
+        // return urls.push(`http://tsinglemon.com/${url}`);
+        return urls.push(`http://192.168.1.105:3008/${url}`);
     })
 
     habit_record.create({
