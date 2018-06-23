@@ -105,7 +105,7 @@ function* habit(action) {
                         userId: action.data.userId,
                     }
                 })
-                // console.log(sagaData)
+                console.log(sagaData)
                 yield put(actionMethod.store_habitData(sagaData));
             } catch (e) {
                 console.log(e)

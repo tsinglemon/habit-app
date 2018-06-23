@@ -2,6 +2,7 @@
 
 
 const express = require('express');
+const socket_io = require('socket.io');
 const mongoose = require('mongoose');
 
 // 设置存储上传文件名和路径的配置
@@ -28,7 +29,7 @@ const multerConfig = {
     // 一些过滤配置
     limits: {
         // 限制文件大小不能超过5M，单位字节。
-        fileSize: 30000000
+        fileSize: 5242880
     }
 }
 
@@ -41,19 +42,21 @@ const habit_record = require('../models/habit_record.js')
 const user_info = require('../models/user_info.js')
 const user_attention = require('../models/user_attention.js')
 const user_collect = require('../models/user_collect.js')
+const user_habit = require('../models/user_habit.js')
 
 
 // 获取个人加入的习惯
 router.get('/getHabits', (req, res) => {
     let userId = req.query.userId;
-    console.log(userId)
-    user_info.findOne({
+    user_habit.find({
         user: userId
     }).populate({
-        path: "habits.habit"
-    }).exec((err, msg) => {
+        path: "user"
+    }).populate({
+        path: "habit"
+    }).exec((err, result) => {
         res.json({
-            habitList: msg
+            habitInfo: result
         })
     })
 })
@@ -82,17 +85,17 @@ router.get('/search', (req, res) => {
         (err, allHabit) => {
             if (err) return;
 
-            user_info.findOne({
+            user_habit.find({
                 user: userId
             }).populate({
-                path: "habits.habit"
+                path: 'habit'
             }).exec((err, msg) => {
                 // 确保习惯是唯一的
                 habit_all.findOne({
                     habitName
                 }, (err, oneResult) => {
                     // 获取已经加入的习惯
-                    let myHabits = msg.habits.map((item, i) => {
+                    let myHabits = msg.map((item) => {
                         return {
                             habitName: item.habit.habitName,
                             stateName: '已加入',
@@ -135,7 +138,6 @@ router.get('/search', (req, res) => {
                             habitName
                         })
                     }
-
                     res.json({
                         searchResult,
                         isUpdate: false
@@ -157,101 +159,76 @@ router.get('/createHabit', (req, res) => {
             res.json(err)
             return;
         }
-
-        if (!msg) {
-            habit_all.create({
-                habitName,
-                userCount: 1,
-                thum: "/images/default_habit.jpg"
-            }, (err, msg) => {
-                let {
-                    _id: habitId,
-                    userCount
-                } = msg
-
-                user_info.update({
-                    user: userId
-                }, {
-                        $push: {
-                            "habits": [{
-                                habit: habitId,
-                                createDate: new Date(),
-                                count: 0,
-                                isClockIn: false
-                            }]
-                        }
-                    }, (err, msg) => {
-                        res.json({
-                            searchResult: [
-                                {
-                                    habitName,
-                                    userCount,
-                                    stateName: '已加入'
-                                }
-                            ],
-                            isUpdate: true
-                        })
-                    })
-            })
-        } else {
-            res.json({
-                code: 10,
-                msg: "习惯已存在"
-            })
+        if (msg) {
+            res.json({ msg: "习惯已存在" })
+            return;
         }
+        habit_all.create({
+            habitName,
+            userCount: 1,
+            thum: "/images/default_habit.jpg"
+        }, (err, msg) => {
+            let {
+                _id: habitId,
+                userCount
+            } = msg;
+            user_habit.create({
+                user: userId,
+                habit: habitId
+            }, (err, result) => {
+                res.json({
+                    isUpdate: true,
+                    searchResult: [
+                        {
+                            habitName,
+                            userCount,
+                            stateName: '已加入'
+                        }
+                    ]
+                })
+            })
+        })
     })
 })
 
 
 // 添加个人习惯
 router.get('/addHabit', (req, res) => {
-
     let habitId = req.query.habitId;
     let userId = req.query.userId;
-    user_info.findOne({
+    user_habit.findOne({
         user: userId,
-        "habits.habit": habitId
+        habit: habitId
     }, (err, msg) => {
         if (msg) {
-            res.json({
-                code: 10,
-                msg: "您已添加该习惯"
-            })
-        } else {
-            user_info.update({
-                user: userId
-            }, {
-                    $push: {
-                        "habits": [{
-                            habit: habitId,
-                            createDate: new Date(),
-                            count: 0,
-                            isClockIn: false
-                        }]
-                    }
-                }, (err) => {
-                    habit_all.findOneAndUpdate({
-                        _id: habitId
-                    }, {
-                            $inc: {
-                                "userCount": +1
-                            }
-                        }, {
-                            new: true
-                        }, (err, msg) => {
-                            res.json({
-                                searchResult: [
-                                    {
-                                        habitId: msg._id,
-                                        userCount: msg.userCount,
-                                        stateName: '已加入'
-                                    }
-                                ],
-                                isUpdate: true
-                            })
-                        })
-                })
+            res.json({ msg: "您已添加该习惯" })
+            return;
         }
+        user_habit.create({
+            user: userId,
+            habit: habitId
+        }, (err, result) => {
+            habit_all.findOneAndUpdate({
+                _id: habitId
+            }, {
+                    $inc: {
+                        "userCount": +1
+                    }
+                }, {
+                    new: true
+                }, (err, msg) => {
+                    res.json({
+                        isUpdate: true,
+                        searchResult: [
+                            {
+                                habitId: msg._id,
+                                userCount: msg.userCount,
+                                stateName: '已加入'
+                            }
+                        ]
+                    })
+                })
+        })
     })
 })
 // 删除个人的习惯
@@ -260,51 +237,36 @@ router.post('/delHabit', (req, res) => {
     let habitId = req.body.habitId;
     let userId = req.body.userId;
 
-    user_info.findOne({
+    user_habit.remove({
         user: userId,
-        "habits.habit": habitId
+        habit: habitId
     }, (err, msg) => {
         if (!msg) {
             res.json({
-                code: 10,
                 msg: "您还没添加该习惯"
             })
-        } else {
-            user_info.update({
-                user: userId
-            }, {
-                    $pull: {
-                        "habits": {
-                            habit: habitId
-                        }
-                    }
-                }, (err, msg) => {
-                    habit_record.remove({
-                        user: userId
-                    }, (err, msg) => {
-                        user_collect.remove({
-                            author:userId
-                        },(err,r)=>{})
-                    })
-
-                    habit_all.findOneAndUpdate({
-                        _id: habitId
-                    }, {
-                            $inc: {
-                                "userCount": -1
-                            }
-                        }, (err, msg) => {
-                            res.json({
-                                habitList: [
-                                    {
-                                        habitId
-                                    }
-                                ],
-                                isDel: true
-                            })
-                        })
-                })
+            return;
         }
+        habit_record.remove({
+            user: userId
+        }, (err, msg) => {
+            user_collect.remove({
+                author: userId
+            }, (err, r) => { })
+        })
+
+        habit_all.findOneAndUpdate({
+            _id: habitId
+        }, {
+                $inc: { "userCount": -1 }
+            }, (err, msg) => {
+                res.json({
+                    isDel: true,
+                    habitInfo: [{
+                        habit: habitId
+                    }]
+                })
+            })
     })
 })
 
@@ -313,52 +275,44 @@ router.get('/clockIn', (req, res) => {
     let habitId = req.query.habitId;
     let userId = req.query.userId;
 
-    user_info.find({
+    user_habit.findOne({
         user: userId,
-        "habits.habit": habitId
-    }, "habits.$", (err, msg) => {
-
-        if (msg[0].habits[0].isClockIn) {
-            res.json({ msg: "已签到" })
-        } else {
-            user_info.findOneAndUpdate({
+        habit: habitId
+    }).exec((err, msg) => {
+        if (!msg) {
+            user_habit.create({
                 user: userId,
-                "habits": {
-                    // `$elemMatch专门用于查询数组Field中元素是否满足指定的条件。
-                    $elemMatch: {
-                        habit: habitId
-                    }
+                habit: habitId,
+                isClockIn: true,
+                date: [new Date()]
+            }, (err, result) => {
+                res.json({
+                    habitInfo: result
+                })
+            })
+        } else if (msg.isClockIn) {
+            res.json({
+                habitInfo: {
+                    msg: '已签到'
                 }
+            })
+        } else {
+            user_habit.findOneAndUpdate({
+                user: userId,
+                habit: habitId
             }, {
-                    // 修改数组里某个对象的某个属性值，且不引起_id的变化
-                    $inc: {
-                        "habits.$.count": +1
-                    },
                     $set: {
-                        "habits.$.lastDate": new Date(),
-                        "habits.$.isClockIn": true
+                        isClockIn: true,
+                        date: [new Date()],
+                        lastDate: new Date()
                     },
-                    $push: {
-                        "habits.$.date": Date.now()
-                    }
-                }, {
-                    new: true
-                }).populate({
-                    path: "habits.habit"
-                }).exec((err, msg) => {
-                    // TODO 签到返回签到状态，返回到客户端进行合并，然后更新组件。
-
-                    let bookHabit = msg.habits.find((item) => {
-                        let itemHabit = JSON.stringify(item.habit._id);
-                        let _habitId = JSON.stringify(habitId);
-                        return itemHabit === _habitId
-                    })
-                    // 不知道为什么不能用habits会没法覆盖赋值，只能用其他名字（book）来代替
+                    $inc: { "count": +1 }
+                }, { new: true }).
+                populate({ path: 'habit' }).
+                exec((err, result) => {
                     res.json({
                         isUpdate: true,
-                        habitList: {
-                            book: [bookHabit]
-                        }
+                        habitInfo: [result]
                     })
                 })
         }
@@ -410,7 +364,6 @@ router.post('/record', imageUpload.array('recordImage'), (req, res) => {
 // 删除了自己的图文，别人要是收藏过就会查不到，解决办法除了这里使用的直接也删掉收藏者的图文，
 // 还可以只是删掉这条图文的数据，保留该图文的ID不变，这样可以避免查询关联的图文时出错。
 router.post('/delRecord', (req, res) => {
-
     let userId = req.body.userId;
     let recordId = req.body.recordId;
 
@@ -555,9 +508,11 @@ router.get('/getRecord', (req, res) => {
             let lastId = msg.length > 0 ? msg[msg.length - 1]._id : lastRecord
 
             if (type === 'getHabitRecord') {
-                user_info.findOne({
+
+                
+                user_habit.findOne({
                     user: userId,
-                    "habits.habit": findObj.habit
+                    habit: findObj.habit
                 }, (err, msg) => {
                     // 查询自己有没有加入这个习惯
                     isJoinHabit = msg ? false : true;
@@ -610,7 +565,6 @@ router.get('/like', (req, res) => {
                     new: true
                 }, (err, msg) => {
                     // 取消用户点赞过的图文
-
                     user_collect.remove({
                         user: userId,
                         recordId
@@ -660,7 +614,7 @@ router.post('/comment', (req, res) => {
     let recordId = req.body.recordId;
     let content = req.body.content;
     let otherUserComment = req.body.otherUserComment;
-    console.log(otherUserComment)
+
     habit_record.findOneAndUpdate({ _id: recordId }, {
         $push: {
             comment: [{
@@ -669,29 +623,23 @@ router.post('/comment', (req, res) => {
                 content,
             }]
         },
-        $inc: {
-            commentCount: +1
-        },
-        $set: {
-            "time": new Date()
-        },
-    }, { new: true }).populate({
-        path: 'comment.user'
-    }).populate({
-        path: 'user'
-    }).exec((err, msg) => {
-
-        // 最新的评论在最上面，最早的评论在下面
-        if (msg.comment[0]) {
-            msg.comment.sort((n1, n2) => {
-                return n2.time - n1.time
+        $inc: { commentCount: +1 },
+        $set: { "time": new Date() },
+    }, { new: true }).
+        populate({ path: 'comment.user' }).
+        populate({ path: 'user' }).
+        exec((err, msg) => {
+            // 最新的评论在最上面，最早的评论在下面
+            if (msg.comment[0]) {
+                msg.comment.sort((n1, n2) => {
+                    return n2.time - n1.time
+                })
+            }
+            res.json({
+                type: 'update',
+                recordList: [msg]
             })
-        }
-        res.json({
-            type: 'update',
-            recordList: [msg]
         })
-    })
 })
 
 // 删除评论/回复
@@ -730,54 +678,6 @@ router.post('/delComment', (req, res) => {
         })
 })
 
-// 初始数据
-router.get('/init', (req, res) => {
-
-    // let habitId = "5aedc78687cfad73641f347e";
-    let habitId = "5b19de33a9dc32ee015925db";
-    let userId = "5b19dd56a9dc32ee015925d5";
-
-    // 根据最后更新的时间判断是否需要重置该习惯的签到状态
-    user_info.find({
-        user: userId,
-        "habits.habit": habitId
-    }, "habits.$", (err, msg) => {
-
-        let lastDate = msg[0].habits[0].lastDate
-        let now = new Date()
-        let year = now.getFullYear(),
-            month = now.getMonth(),
-            date = now.getDate()
-        let today = new Date(year, month, date)
-        let dis = today.getTime() + 0 - lastDate.getTime() + 0;
-
-        if (dis < 0) {
-            // if (dis > 0) {
-            res.json("不需要重置")
-        } else {
-            user_info.findOneAndUpdate({
-                user: userId,
-                "habits": {
-                    // `$elemMatch专门用于查询数组Field中元素是否满足指定的条件。
-                    $elemMatch: {
-                        habit: habitId
-                    }
-                }
-            }, {
-                    // 修改数组里某个对象的某个属性值，且不引起_id的变化
-                    $set: {
-                        "habits.$.isClockIn": false
-                    }
-                }, {
-                    new: true
-                }, (err, msg) => {
-
-
-                    res.json(msg)
-                })
-        }
-    })
-})
 
 // 关注
 /**

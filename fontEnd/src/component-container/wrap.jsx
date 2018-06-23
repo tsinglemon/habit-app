@@ -28,17 +28,38 @@ class wrap extends Component {
     }
     componentDidMount() {
         let {
-            async_isLogin
+            async_isLogin,
+            store_habitData
         } = this.props.actionMethod;
-
         let token = window.localStorage.getItem("token");
 
-        async_isLogin({
-            data: {
-                token: token
-            }
+        // 这里集中处理websocket广播回来的数据
+        var socket = io('http://localhost:3008', {});
+        // var socket = io('120.79.189.4:3000', {});
+
+        socket.on('connect', (d) => {
+            console.log(socket.id)
         })
-        this.getRecord()
+
+        socket.on('message', (msg) => {
+            if (msg.reBook) {
+                store_habitData({
+                    data: {
+                        isUpdate: true,
+                        reBook: msg.reBook
+                    }
+                })
+            }
+            console.log(msg)
+        })
+
+
+        // async_isLogin({
+        //     data: {
+        //         token: token
+        //     }
+        // })
+        // this.getRecord()
     }
     componentDidUpdate() {
         let {
@@ -66,14 +87,14 @@ class wrap extends Component {
                     type: '-',
                     isHaveDate: '1',
                     recordList: [],
-                    bottomTab:tab
+                    bottomTab: tab
                 }
             })
         }, 0)
         this.setState({
             selectedTab: this.props.record.bottomTab
         }, () => {
-            if (this.state.selectedTab === 'my') {}
+            if (this.state.selectedTab === 'my') { }
         })
     }
     getRecord() {

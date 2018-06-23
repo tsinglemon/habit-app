@@ -155,7 +155,7 @@
     text-align: center;
     border-radius: 50%;
 }
-.comment_pic:before {
+.comment_pic:after {
     content:"";
     display:inline-block;
     vertical-align: middle;

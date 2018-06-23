@@ -4,10 +4,12 @@ import * as actionType from '../constants/index.js'
 
 // 合并并初始化初始值。
 let initHabitData = {
+    habitInfo:[],
     searchResult: [],
-    habitList: [],
     isUpdate: false,
     isDel: false,
+    // 重置签到状态（暂定每天零点重置）
+    reBook:false
 };
 
 export default (state, action) => {
@@ -18,12 +20,12 @@ export default (state, action) => {
 
     switch (action.type) {
         case actionType.STORE__HABIT_DATA:
-
             let {
+                habitInfo = state.habitInfo,
                 searchResult = state.searchResult,
-                habitList = state.habitList,
                 isUpdate = state.isUpdate,
-                isDel = state.isDel
+                isDel = state.isDel,
+                reBook = state.reBook
             } = newData.data;
             // 创建、加入后替换对应的状态
             if (isUpdate) {
@@ -37,44 +39,39 @@ export default (state, action) => {
                         return update ? { ...item, ...update } : item
                     })
                 }
-                // 展示个人习惯列表
-                if (habitList && habitList.habits) {
-                    habitList.habits = state.habitList.habits.map((item, index) => {
-                        let update = habitList.habits.find(
-                            (el) => {
-                                return el.habitName === item.habit.habitName
-                            });
-                        return update ? { ...item, ...update } : item
-                    })
-                }
-                // 展示签到状态
-                if (habitList && habitList.book) {
-                    habitList.habits = state.habitList.habits.map((item, index) => {
-                        let update = habitList.book.find(
+                // 展示习惯签到信息
+                if (habitInfo) {
+                    habitInfo = state.habitInfo.map((item) => {
+                        let update = habitInfo.find(
                             (el) => {
                                 return el.habit._id === item.habit._id
                             });
                         return update ? { ...item, ...update } : item
                     })
                 }
+                // 重置所有习惯的签到状态
+                if (reBook) {
+                    state.reBook = reBook;
+                }
             }
             // 删除习惯
             if (isDel) {
-                if (habitList[0]) {
-                    let removeIndex = state.habitList.habits.findIndex((item) => {
-                        return item.habit._id === habitList[0].habitId
+                if (habitInfo[0]) {
+                    let removeIndex = state.habitInfo.findIndex((item) => {
+                        return item.habit._id === habitInfo[0].habit
                     })
                     if (removeIndex !== -1) {
-                        state.habitList.habits.splice(removeIndex, 1)
-                        habitList = state.habitList;
+                        state.habitInfo.splice(removeIndex, 1)
+                        habitInfo = state.habitInfo;
                     }
                 }
             }
             state = {
                 ...state,
                 ...{
+                    habitInfo,
                     searchResult,
-                    habitList
+                    reBook
                 }
             }
             return state

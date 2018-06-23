@@ -43,19 +43,20 @@ class book extends Component {
             async_getHabit
         } = this.props.actionMethod;
         let {
-            habitList = []
+            habitInfo = []
         } = this.props.habit;
         let token = window.localStorage.getItem("token");
         let userId = window.localStorage.getItem("userId");
         let {
             id: habitId
         } = this.props.match.params;
+
         async_isLogin({
             data: {
                 token: token
             }
         })
-        if (!(habitList.habits && habitList.habits[0])) {
+        if (!(habitInfo[0])) {
             async_getHabit({
                 userId
             })
@@ -141,10 +142,17 @@ class book extends Component {
     }
     onBook(habitId) {
         let {
-            async_bookHabit
+            async_bookHabit,
+            store_habitData
         } = this.props.actionMethod;
         let userId = window.localStorage.getItem("userId");
 
+        store_habitData({
+            data: {
+                isUpdate: true,
+                reBook: false
+            }
+        })
         async_bookHabit({
             userId,
             habitId
@@ -175,7 +183,7 @@ class book extends Component {
             visible,
         });
     };
-    goBack(val) {
+    goBack() {
         let {
             store_recordData
         } = this.props.actionMethod;
@@ -185,22 +193,10 @@ class book extends Component {
                 bookWay: "simple"
             })
         } else {
-            // TODO 强行清空会在返回瞬间无谓加载了一次页面，解决办法是给每个习惯定义一个键。
-            // 目前的办法只是为了在返回的时候闪屏，故意延迟200毫秒
-
             this.props.history.goBack()
-            // setTimeout(() => {
-            //     store_recordData({
-            //         data: {
-            //             type: '-',
-            //             isHaveDate: '1',
-            //             recordList: []
-            //         }
-            //     })
-            // }, 200)
         }
     }
-    issue(val) {
+    issue() {
         let {
             text,
             files
@@ -212,11 +208,9 @@ class book extends Component {
             id: habitId
         } = this.props.match.params;
         let userId = window.localStorage.getItem('userId');
-        if (text.trim() === '') return;
-        if (files[0].file.size > 5242880) {
-            return (
-                Toast.info('图片大小不能超过5M', 1)
-            )
+        // if (text.trim() === '') return;
+        if (files[0] && files[0].file.size > 5242880) {
+            return (Toast.info('图片大小不能超过5M', 1))
         }
         async_issueRecord({
             text,
@@ -234,10 +228,15 @@ class book extends Component {
     }
     renderBook(value, bookHabit) {
         let {
-            data,
             habit,
-            isClockIn,
+            isClockIn
         } = bookHabit;
+        let {
+            reBook
+        } = this.props.habit
+        // 如果处于重置了就false，否则就是它本身的状态
+        console.log(bookHabit)
+        isClockIn = reBook ? false : isClockIn
         let simple = (
             <div className={`${style.simple}`}>
                 <div className={`${style.rotate} ${isClockIn ? style.active : ""}`}
@@ -302,15 +301,15 @@ class book extends Component {
 
     render() {
         let {
-            habitList
+            habitInfo
         } = this.props.habit;
         let {
             id: bookHabitId
         } = this.props.match.params;
         let bookHabit = {}
 
-        if (habitList.habits && habitList.habits[0]) {
-            bookHabit = habitList.habits.find((item) => {
+        if (habitInfo[0]) {
+            bookHabit = habitInfo.find((item) => {
                 return item.habit._id === bookHabitId
             })
         }
@@ -324,9 +323,7 @@ class book extends Component {
             </NavBar>
         );
         let {
-            data,
-            habit,
-            isClockIn,
+            habit
         } = bookHabit;
         let {
             tempRecord,

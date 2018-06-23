@@ -67,11 +67,11 @@ class habit extends Component {
     }
     editHabit() {
         let {
-            habitList
+            habitInfo
         } = this.props.habit;
 
-        if (!habitList.habits) return;
-        let editHabits = habitList.habits.map((item, index) => {
+        if (!habitInfo) return;
+        let editHabits = habitInfo.map((item, index) => {
 
             return (
                 <List.Item
@@ -101,18 +101,19 @@ class habit extends Component {
     }
     myHabits() {
         let {
-            habitList
+            habitInfo,
+            reBook
         } = this.props.habit;
 
-        if (!habitList || !habitList.habits) return;
-        let showHabits = habitList.habits.map((item, index) => {
-
+        if (!habitInfo) return;
+        return habitInfo.map((item, index) => {
+            let isClockIn = reBook ? false : item.isClockIn
             return (
                 <List.Item
                     className="per-habit-item"
                     arrow=""
                     thumb={<div className='iconfont icon-marketing_fill'
-                        style={item.isClockIn?{color:'#39cc7b'}:{}}
+                        style={isClockIn?{color:'#39cc7b'}:{}}
                     ></div>}
                     multipleLine
                     onClick={() => {
@@ -125,7 +126,7 @@ class habit extends Component {
                 </List.Item>
             )
         })
-        return showHabits
+        // return showHabits
 
     }
 
