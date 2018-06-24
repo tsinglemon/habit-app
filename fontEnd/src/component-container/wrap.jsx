@@ -34,11 +34,12 @@ class wrap extends Component {
         let token = window.localStorage.getItem("token");
 
         // 这里集中处理websocket广播回来的数据
-        var socket = io('http://localhost:3008', {});
+        var socket = io('http://127.0.0.1:3008', {});
+        var socket = io('http://tsinglemon.com', {});
         // var socket = io('120.79.189.4:3000', {});
 
         socket.on('connect', (d) => {
-            console.log(socket.id)
+            alert('socketId:'+socket.id)
         })
 
         socket.on('message', (msg) => {

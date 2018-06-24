@@ -292,9 +292,8 @@ router.get('/clockIn', (req, res) => {
             })
         } else if (msg.isClockIn) {
             res.json({
-                habitInfo: {
-                    msg: '已签到'
-                }
+                isUpdate: true,
+                habitInfo: [msg]
             })
         } else {
             user_habit.findOneAndUpdate({

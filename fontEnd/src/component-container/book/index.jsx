@@ -147,15 +147,15 @@ class book extends Component {
         } = this.props.actionMethod;
         let userId = window.localStorage.getItem("userId");
 
+        async_bookHabit({
+            userId,
+            habitId
+        })
         store_habitData({
             data: {
                 isUpdate: true,
                 reBook: false
             }
-        })
-        async_bookHabit({
-            userId,
-            habitId
         })
     }
 
@@ -309,6 +309,7 @@ class book extends Component {
         let bookHabit = {}
 
         if (habitInfo[0]) {
+            console.log(habitInfo)
             bookHabit = habitInfo.find((item) => {
                 return item.habit._id === bookHabitId
             })
@@ -322,6 +323,7 @@ class book extends Component {
                 {'请返回上一层'}
             </NavBar>
         );
+        console.log(bookHabit)
         let {
             habit
         } = bookHabit;
