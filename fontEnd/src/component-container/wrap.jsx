@@ -35,11 +35,12 @@ class wrap extends Component {
 
         // 这里集中处理websocket广播回来的数据
         var socket = io('http://127.0.0.1:3008', {});
-        var socket = io('http://tsinglemon.com', {});
+        // var socket = io.connect('http://tsinglemon.com');
+        
         // var socket = io('120.79.189.4:3000', {});
 
         socket.on('connect', (d) => {
-            alert('socketId:'+socket.id)
+            console.log('socketId:' + socket.id)
         })
 
         socket.on('message', (msg) => {
@@ -103,7 +104,7 @@ class wrap extends Component {
             async_getRecord
         } = this.props.actionMethod;
         let {
-            tabIndex
+            tabIndex,
         } = this.props.record;
         let userId = window.localStorage.getItem("userId");
 
