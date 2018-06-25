@@ -5,6 +5,9 @@
 ## 项目初衷
 该项目从创建自己第一个习惯开始，每天一签到，签到后可以发表这一天的心得体会，  这些心得体会会公布在社区，其他用户可以对某一条心得体会进行收藏和评论；旨在通过每天的记录和不断的正向反馈，慢慢培养起跟随自己一生的好习惯；  
 
+## 线上地址
+![线上体验](http://tsinglemon.com/images/share.png)
+
 ## 技术栈
 > 前端  
 
@@ -22,9 +25,6 @@
 
 * express
 * mongodb
-
-## 在线体验
-![线上体验](http://tsinglemon.com/images/share.png)
 
 ## 快速开始
 *假设大家已经安装好[node环境](https://nodejs.org/zh-cn/download/)*
