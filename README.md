@@ -23,6 +23,9 @@
 * express
 * mongodb
 
+## 在线体验
+![线上体验](http://tsinglemon.com/images/share.png)
+
 ## 快速开始
 *假设大家已经安装好[node环境](https://nodejs.org/zh-cn/download/)*
 
