@@ -1,13 +1,11 @@
 
 
 
-import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
-import { asyncComponent } from "../static/javascript/asyncComponent.js"
+// import { Link, Route, BrowserRouter, Switch } from 'react-router-dom';
+// import { asyncComponent } from "../static/javascript/asyncComponent.js"
 
 import {Wrap} from '../component-container/wrap.jsx';
-import Habit from '../component-container/habit.jsx';
 import { Book } from '../component-container/book/index.jsx';
-import  {Discover}  from '../component-container/discover.jsx';
 import  {ItemRecords}  from '../component-container/pubic-item-habit/index.jsx';
 import  {AddHabit}  from '../component-container/add-habit/index.jsx';
 import  {Interest}  from '../component-container/interest/index.jsx';

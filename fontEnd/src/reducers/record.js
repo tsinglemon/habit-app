@@ -23,7 +23,6 @@ export default (state, action) => {
 
             let {
                 type,
-                key,
                 recordList,
                 isHaveDate,
                 isJoinHabit,

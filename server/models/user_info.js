@@ -14,28 +14,7 @@ var option = {
         ref: "user_security"
     },
     headPic: String,
-    attitude: String,
-    habits: [{
-        habit: {
-            type: Schema.Types.ObjectId,
-            ref: "habit_all"
-        },
-        createDate:{
-            type: Date,
-            default: Date.now
-        },
-        lastDate: {
-            type: Date,
-            default: Date.now
-        },
-        date: [{
-            type: Date,
-            default: Date.now
-        }],
-        count: Number,
-        isClockIn: Boolean
-    }],
-    // collect: [],
+    attitude: String
     
 
 }
