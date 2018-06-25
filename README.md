@@ -47,4 +47,4 @@
 
 最后，在浏览器打开`http://localhost:3008`，如果见到下图即可
 
-![成功界面](https://user-gold-cdn.xitu.io/2018/6/25/1643518c520414df?w=361&h=640&f=png&s=5917)
+![成功界面](http://tsinglemon.com/images/success.png)
