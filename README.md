@@ -1,3 +1,5 @@
+> 该项目暂停维护。
+
 # habit-app
 记录习惯培养过程的心得体会
 <!-- [项目github地址](https://github.com/tsinglemon/habit-app) -->
